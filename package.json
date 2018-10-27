@@ -1,0 +1,28 @@
+{
+  "name": "namg.stock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node src/main.js",
+    "start": "npm run dev",
+    "test": "npm run lint",
+    "deploy": "pm2 deploy ecosystem.config.js "
+  },
+  "author": "xujia.bai",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "config": "^2.0.1",
+    "humps": "^2.0.1",
+    "json2csv": "^4.2.1",
+    "lodash": "^4.17.11",
+    "moment": "^2.22.2",
+    "mysql2": "^1.6.1",
+    "sequelize": "^4.39.1",
+    "sleep": "^5.2.3",
+    "tracer": "^0.9.1",
+    "websocket": "^1.0.28",
+    "yawl": "^1.0.2"
+  }
+}
