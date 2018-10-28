@@ -3,7 +3,7 @@ const logger = require('./logger')
 const run = async() => {
   try {
     logger.info('Start!');
-    eosSocketWSSClient.deal();
+    eosSocketWSSClient.dealWs();
     process.on('uncaughtException', function(err) {
       // handle the error safely
       logger.error("uncaughtException", err);
