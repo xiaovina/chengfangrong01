@@ -4,10 +4,6 @@ const run = async() => {
   try {
     logger.info('Start!');
     eosSocketWSSClient.dealWs();
-    process.on('uncaughtException', function(err) {
-      // handle the error safely
-      logger.error("uncaughtException", err);
-    })
   } catch (err) {
     logger.error(err);
   }
