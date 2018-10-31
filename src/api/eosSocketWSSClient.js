@@ -81,7 +81,7 @@ class EosSocketWSSClient {
       // hack [{...}][{...}]
       data = data.replace(/\s+/g,"");
       if (data.indexOf('}][{') > -1) {
-        data.replace('}][{', '},{')
+        data = data.replace('}][{', '},{')
       }
 
       let messageList
