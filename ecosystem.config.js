@@ -5,8 +5,8 @@ module.exports = {
    */
   apps: [
     {
-      name: 'letou.wss.client',
-      script: 'src/main.js',
+      name: 'letou.sync.job',
+      script: 'src/tools/syncLotteryJob.js',
       instances: 1,
       watch: true,
       exec_mode: "cluster"
