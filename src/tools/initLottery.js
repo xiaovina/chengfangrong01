@@ -11,7 +11,8 @@ const run = async() => {
   logger.info(process.argv[2])
 
   try {
-    await eosLottery.InitLottery(process.argv[2]);
+    const lower = Number(process.argv[2]) - 1;
+    await eosLottery.InitLottery(lower);
   } catch (err) {
     logger.error("InitLottery", err);
   }
