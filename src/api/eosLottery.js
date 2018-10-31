@@ -57,6 +57,8 @@ class EosLottery {
   }
 
   async _getList(lower_bound, upper_bound, limit) {
+
+    const lower = Number(lower_bound)
     return axios.post(
       'https://eosjs.eosplay.com/v1/chain/get_table_rows',
       {
@@ -65,8 +67,8 @@ class EosLottery {
         scope: "eosplaybrand",
         table: "game",
         table_key: "id",
-        lower_bound: lower_bound,
-        upper_bound: upper_bound || lower_bound + 1,
+        lower_bound: lower + 1,
+        upper_bound: upper_bound || lower + 2,
         limit: limit || 1
       }
     ).then( function (response) {
