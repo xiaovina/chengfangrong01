@@ -3,7 +3,7 @@ const logger = require('./logger')
 const run = async() => {
   try {
     logger.info('Start!');
-    eosSocketWSSClient.dealWs();
+    eosSocketWSSClient.dealWsEx();
   } catch (err) {
     logger.error(err);
   }
