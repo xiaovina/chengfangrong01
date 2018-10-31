@@ -76,11 +76,12 @@ class EosSocketWSSClient {
       this.send("ping");
     }
     wsc.onmessage = function(data, flags, number){
-      logger.trace(`WebSocketClient message #${number}: `, data);
+      console.log(`WebSocketClient message #${number}: `, data);
 
       // hack [{...}][{...}]
+      data = data.replace(/\s+/g,"");
       if (data.indexOf('}][{') > -1) {
-        data.replace('}],[{', '},{')
+        data.replace('}][{', '},{')
       }
 
       let messageList
