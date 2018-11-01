@@ -18,16 +18,17 @@ class EosLottery {
         newestLottery = newestLottery.rows[0]
         console.log(`newestLottery:`, newestLottery);
 
-        const result = this._resultHandel(newestLottery.result)
-        const lData = {
-          gameid: newestLottery.id,
-          result,
-          daxiao: this._daxiaoHandle(result),
-          danshuang: this._danshuangHandle(result),
-          recordTime
+        if (newestLottery.result != -1) {
+          const result = this._resultHandel(newestLottery.result)
+          const lData = {
+            gameid: newestLottery.id,
+            result,
+            daxiao: this._daxiaoHandle(result),
+            danshuang: this._danshuangHandle(result),
+            recordTime
+          }
+          await LotteryRecord.create(lData)
         }
-        const cResult = await LotteryRecord.create(lData)
-        // console.log(`cResult:`, cResult);
       }
     }
   }
