@@ -73,7 +73,6 @@ class EosLottery {
         limit: limit || 1
       }
     ).then( function (response) {
-      // console.log(`_getList:`, response);
       if (response && response.status && response.status === 200) {
         console.log(`_getList:`, response.data)
         return response.data;

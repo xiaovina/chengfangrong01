@@ -1,4 +1,3 @@
-const url = require('url');
 const logger = require('../logger')
 const db = require('../db')
 const { SocketData, LotteryRecord } = db.models
