@@ -1,5 +1,3 @@
-# NaMg
-
 ## usage
 
 ### pre-setup
@@ -12,10 +10,21 @@ curl --silent --location https://rpm.nodesource.com/setup_9.x | sudo bash - && s
 ls -la
 ```
 
-``` shell
-sudo pm2 start ecosystem.config.js
+### l data
+
+> ENV can be test, development, production
+
+#### init ldata
+
+``` sh
+NODE_ENV=<env> node tools/initLottery.js <gameid>
 ```
 
+#### start sync work
+
+```sh
+pm2 start pm2.config.js --only letou-sync-worker-<env> --watch
+```
 
 ### debug
 

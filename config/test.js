@@ -1,11 +1,11 @@
 module.exports = {
-  NODE_ENV: 'production',
+  NODE_ENV: 'test',
   mysql : {
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'Chengnet123',
-    database: 'eosplay',
+    password: 'root',
+    database: 'DevTest',
     charset: 'utf8mb4',
     timezone: 'UTC',
     options: {
@@ -20,8 +20,5 @@ module.exports = {
       underscored: false,
       benchmark: true
     }
-  },
-  log: {
-    level: 'debug',
   }
 }

@@ -1,13 +1,11 @@
 {
-  "name": "namg.stock",
+  "name": "chengfangrong01",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node src/main.js",
-    "start": "npm run dev",
-    "test": "npm run lint",
-    "deploy": "pm2 deploy ecosystem.config.js "
+    "dev": "NODE_ENV=development node src/main.js",
+    "start": "npm run dev"
   },
   "author": "xujia.bai",
   "license": "ISC",
