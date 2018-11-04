@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>EOS Analizy tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css" />
+  <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://jonthornton.github.io/jquery-timepicker/jquery.timepicker.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://jonthornton.github.io/jquery-timepicker/jquery.timepicker.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.standalone.css" />
+  <script src="js/datepair.min.js"></script>
+  <script src="js/jquery.datepair.min.js"></script>
+</head>
+<body class="container">
+  <h2>EOS Analizy tool</h2>
+  <form id="AnalizyForm">
+    <div class="row">
+      <div class="form-group col-sm">
+        <label for="start" class="col-sm-4 col-form-label">开始时间：</label>
+        <div class="row col-sm-10">
+          <input type="text" class="col-sm form-control date start" id="startDate" placeholder="开始日期" required>
+          <input type="text" class="col-sm form-control time start" id="startTime" placeholder="开始时间" required>
+        </div>
+      </div>
+      <div class="form-group col-sm">
+          <label for="end" class="col-sm-4 col-form-label">结束时间：</label>
+          <div class="row col-sm-10">
+              <input type="text" class="col-sm form-control date end" id="endDate" placeholder="开始日期" required>
+              <input type="text" class="col-sm form-control time end" id="endTime" placeholder="开始时间" required>
+          </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-sm">
+          <label for="daxiaodanshaung" class="col-sm-4 col-form-label">大小单双</label>
+          <select id="daxiaodanshaung" class="form-control col-sm-10" required>
+            <option value="大">大</option>
+            <option value="小">小</option>
+            <option value="单">单</option>
+            <option value="双">双</option>
+          </select>
+      </div>
+      <div  class="form-group col-sm">
+        <label for="danshuang" class="col-sm-12 col-form-label"></label>
+        <div class="row col-sm-10">
+          <button type="button" class="btn btn-primary" onclick="doAnalizy()" style="margin-top:13px;">分析</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <hr/>
+
+  <div id="AnalizyResult">
+    <div class="row">
+      总共开奖次数<span class="totalGame">-</span>
+    </div>
+    <div class="row analizyList">
+    </div>
+  </div>
+</body>
+<script>
+// initialize input widgets first
+$('#AnalizyForm .time').timepicker({
+    'showDuration': true,
+    'timeFormat': 'H:i'
+});
+
+$('#AnalizyForm .date').datepicker({
+    'format': 'm/d/yyyy',
+    'autoclose': true
+});
+
+// initialize datepair
+var basicExampleEl = document.getElementById('AnalizyForm');
+var datepair = new Datepair(basicExampleEl);
+
+function doAnalizy() {
+  var startDate = $("#startDate").val();
+  var startTime = $("#startTime").val();
+  const start = `${startDate} ${startTime}`;
+  console.log(start);
+
+  var endDate = $("#endDate").val();
+  var endTime = $("#endTime").val();
+  const end = `${endDate} ${endTime}`;
+  console.log(end);
+
+  var daxiaodanshuang = $("#daxiaodanshaung").val();
+  var url;
+  if (daxiaodanshuang == "大" || daxiaodanshuang == "小") {
+    url = `/api/v1/lottery/analizy?start=${start}&end=${end}&daxiao=${daxiaodanshuang}`
+  } else if (daxiaodanshuang == "单" || daxiaodanshuang == "双") {
+    url = `/api/v1/lottery/analizy?start=${start}&end=${end}&danshuang=${daxiaodanshuang}`
+  }
+
+  $.ajax({
+      url: url
+    }).done(function(res) {
+      console.log(res.total);
+      console.log(res.analizyList);
+
+      $("#AnalizyResult .totalGame").html(res.total);
+      $("#AnalizyResult .analizyList").html('');
+      if (res.analizyList && res.analizyList.length > 0) {
+        res.analizyList.forEach((v, k) => {
+          $("#AnalizyResult .analizyList").append(`连续${k+1}次中奖：${v}次 <br/>`)
+        });
+      }
+    });
+}
+
+</script>
+</html>

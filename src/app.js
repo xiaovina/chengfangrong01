@@ -6,7 +6,6 @@ const serve = require('koa-static')
 const path = require('path')
 const _ = require('lodash')
 const logger = require('./logger')
-const { AppError } = require('./error')
 
 // logic
 const routers = require('./routers')
