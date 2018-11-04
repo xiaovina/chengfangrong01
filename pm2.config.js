@@ -12,6 +12,18 @@ module.exports = {
         NODE_APP_INSTANCE: '',
         NODE_ENV: it
       }
+    })),
+    ...envs.map(it => ({
+      name: 'letou-analizy-web-' + it,
+      instances: 1,
+      script: 'src/main.js',
+      args: [],
+      cwd: './',
+      exec_mode: 'cluster_mode',
+      env: {
+        NODE_APP_INSTANCE: '',
+        NODE_ENV: it
+      }
     }))
   ]
 }
