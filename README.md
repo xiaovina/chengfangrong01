@@ -29,7 +29,7 @@ pm2 start pm2.config.js --only letou-sync-worker-<env> --watch
 #### start analizy web
 
 ``` sh
-pm2 start pm2.config.js --only letou-analizy-web-development --watch
+pm2 start pm2.config.js --only letou-analizy-web-<env> --watch
 ```
 
 ### debug
