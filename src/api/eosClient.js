@@ -3,7 +3,7 @@ const { Api, JsonRpc, JsSignatureProvider } = require('eosjs');
 const fetch = require('node-fetch');
 const { TextDecoder, TextEncoder } = require('text-encoding');
 
-const privateKey = "5JAfem2e6us6xtcSiToZcSHB88HBdFMXDAYgwqR3gfrNTTXFTEW";
+const privateKey = "";
 const signatureProvider = new JsSignatureProvider([privateKey]);
 const rpc = new JsonRpc('https://api.eosnewyork.io', { fetch });
 const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
