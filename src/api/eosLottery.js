@@ -1,4 +1,5 @@
 const axios = require('axios')
+const _ = require('lodash')
 const moment = require('moment');
 const { kmp } = require('kmp-matcher');
 const logger = require('../logger')
@@ -61,11 +62,168 @@ class EosLottery {
     logger.debug(dateEnd);
 
     const sql = `
-    select * from LotteryRecord
+    select daxiao, danshuang from LotteryRecord
       where recordTime > :dateStart
       and recordTime <:dateEnd
     `;
     return await db.selectAll(sql, {dateStart, dateEnd});
+  }
+
+  async dealAnalizyAll(list) {
+    const AnalizyRange = {
+      da: '大',
+      da1: 1,
+      xiao: '小',
+      xiao0: 0,
+      dan: '单',
+      dan1: 1,
+      shuang: '双',
+      shuang0: 0
+    };
+
+    let daxiaoList = [];
+    let danshuangList = [];
+    list.forEach(item => {
+      if(item.daxiao === AnalizyRange.da) {
+        daxiaoList.push(1);
+      } else {
+        daxiaoList.push(0);
+      }
+      if(item.danshuang === AnalizyRange.dan) {
+        danshuangList.push(1);
+      } else {
+        danshuangList.push(0);
+      }
+    });
+
+    let daxiaoStr = daxiaoList.map(o => o).join('');
+    logger.debug(daxiaoStr)
+    let danshuangStr = danshuangList.map(o => o).join('');
+    logger.debug(danshuangStr)
+
+    // daxiao handle
+    const daResult = await this._analizyItem(daxiaoStr, '1');
+    logger.debug(daResult)
+    const xiaoResult = await this._analizyItem(daxiaoStr, '0');
+    logger.debug(xiaoResult)
+
+    // danshaung handle
+    const danResult = await this._analizyItem(danshuangStr, '1');
+    logger.debug(danResult)
+    const shuangResult = await this._analizyItem(danshuangStr, '0');
+    logger.debug(shuangResult)
+
+    const result = {
+      daResult: this._dealProbability(daResult),
+      xiaoResult: this._dealProbability(xiaoResult),
+      danResult: this._dealProbability(danResult),
+      shuangResult: this._dealProbability(shuangResult),
+    }
+    logger.debug(result)
+
+    return result
+  }
+
+  async _analizyItem(str, range01) {
+    let result = [];
+    if(range01 === '1') {
+      str = `0${str}0`;
+    } else {
+      str = `1${str}1`;
+    }
+    logger.debug(str);
+
+    for(let i = 1; i <= 15; i++) {
+      let subStr = range01.repeat(i);
+      if(range01 === '1') {
+        subStr = `0${subStr}0`;
+      } else {
+        subStr = `1${subStr}1`;
+      }
+      result.push(this._matchTimes(str, subStr));
+    }
+    return result;
+  }
+
+  _dealProbability(list) {
+    const denominator = parseFloat(_.sum(list))
+    let result = []
+    logger.debug(denominator)
+
+    list.forEach(item => {
+      let r = (item / denominator);
+      r = r.toFixed(4)*100 / 100;
+      r = (r*100).toFixed(2);
+      result.push(r);
+    });
+    return result;
+  }
+
+  async dealAnalizy(list, daxiao = null, danshuang = null) {
+    const AnalizyRange = {
+      da: '大',
+      xiao: '小',
+      dan: '单',
+      shuang: '双'
+    };
+    let result = []
+    try {
+      if (list && list.length > 0) {
+        if (daxiao) {
+          let daxiaoStr = list.map(o => o.daxiao).join('');
+          logger.debug(daxiaoStr);
+
+          if (daxiao === AnalizyRange.da) {
+            daxiaoStr = `小${daxiaoStr}小`;
+            logger.debug(daxiaoStr);
+
+            for(let i = 1; i <= 15; i++) {
+              const daStr = AnalizyRange.da.repeat(i);
+              const daSubString = `小${daStr}小`;
+              result.push(this._matchTimes(daxiaoStr, daSubString));
+            }
+          } else if (daxiao === AnalizyRange.xiao) {
+            daxiaoStr = `大${daxiaoStr}大`;
+            logger.debug(daxiaoStr);
+
+            for(let i = 1; i <= 15; i++) {
+              const xiaoStr = AnalizyRange.xiao.repeat(i);
+              const xiaoSubString = `大${xiaoStr}大`;
+              result.push(this._matchTimes(daxiaoStr, xiaoSubString));
+            }
+          }
+        } else if (danshuang) {
+          let danshuangStr = list.map(o => o.danshuang).join('');
+          logger.debug(danshuangStr);
+
+          if (danshuang === AnalizyRange.dan) {
+            danshuangStr = `双${danshuangStr}双`;
+            logger.debug(danshuangStr);
+
+            for(let i = 1; i <= 15; i++) {
+              const danStr = AnalizyRange.dan.repeat(i);
+              const danSubString = `双${danStr}双`;
+              result.push(this._matchTimes(danshuangStr, danSubString));
+            }
+          } else if (danshuang === AnalizyRange.shuang) {
+            danshuangStr = `单${danshuangStr}单`;
+            logger.debug(danshuangStr);
+
+            for(let i = 1; i <= 15; i++) {
+              const shaungStr = AnalizyRange.shuang.repeat(i);
+              const shuangSubString = `单${shaungStr}单`;
+              result.push(this._matchTimes(danshuangStr, shuangSubString));
+            }
+          }
+        }
+      }
+
+    } catch (err) {
+      logger.error(err);
+    }
+
+    logger.debug(result);
+    return result;
   }
 
   async dealAnalizy(list, daxiao = null, danshuang = null) {

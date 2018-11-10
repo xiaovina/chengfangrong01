@@ -17,47 +17,43 @@
   <h2>EOS Analizy tool</h2>
   <form id="AnalizyForm">
     <div class="row">
-      <div class="form-group col-sm">
+      <div class="form-group col-sm-4">
         <label for="start" class="col-sm-4 col-form-label">开始时间：</label>
         <div class="row col-sm-10">
           <input type="text" class="col-sm form-control date start" id="startDate" placeholder="开始日期" required>
           <input type="text" class="col-sm form-control time start" id="startTime" placeholder="开始时间" required>
         </div>
       </div>
-      <div class="form-group col-sm">
+      <div class="form-group col-sm-4">
           <label for="end" class="col-sm-4 col-form-label">结束时间：</label>
           <div class="row col-sm-10">
               <input type="text" class="col-sm form-control date end" id="endDate" placeholder="开始日期" required>
               <input type="text" class="col-sm form-control time end" id="endTime" placeholder="开始时间" required>
           </div>
       </div>
+      <div class="form-group col-sm-2">
+          <button type="button" class="btn btn-primary" onclick="doAnalizy()" style="margin-top:38px;">分析</button>
+      </div>
     </div>
     <div class="row">
-      <div class="form-group col-sm">
-          <label for="daxiaodanshaung" class="col-sm-4 col-form-label">大小单双</label>
-          <select id="daxiaodanshaung" class="form-control col-sm-10" required>
-            <option value="大">大</option>
-            <option value="小">小</option>
-            <option value="单">单</option>
-            <option value="双">双</option>
-          </select>
-      </div>
-      <div  class="form-group col-sm">
-        <label for="danshuang" class="col-sm-12 col-form-label"></label>
-        <div class="row col-sm-10">
-          <button type="button" class="btn btn-primary" onclick="doAnalizy()" style="margin-top:13px;">分析</button>
-        </div>
-      </div>
     </div>
   </form>
 
   <hr/>
 
-  <div id="AnalizyResult">
+  <div class="container" id="AnalizyResult">
     <div class="row">
-      总共开奖次数<span class="totalGame">-</span>
+      共开奖次数<span class="totalGame">-</span>
     </div>
-    <div class="row analizyList">
+    <div class="row" style="font-weight: 500; margin-top: 20px;">
+      <div class="col-sm-2">连续次数 \ 概率</div>
+      <div class="col-sm-2">大</div>
+      <div class="col-sm-2">小</div>
+      <div class="col-sm-2">单</div>
+      <div class="col-sm-2">双</div>
+    </div>
+    <div class="analizyList" style="color:blue">
+
     </div>
   </div>
 </body>
@@ -88,26 +84,33 @@ function doAnalizy() {
   const end = `${endDate} ${endTime}`;
   console.log(end);
 
-  var daxiaodanshuang = $("#daxiaodanshaung").val();
-  var url;
-  if (daxiaodanshuang == "大" || daxiaodanshuang == "小") {
-    url = `/api/v1/lottery/analizy?start=${start}&end=${end}&daxiao=${daxiaodanshuang}`
-  } else if (daxiaodanshuang == "单" || daxiaodanshuang == "双") {
-    url = `/api/v1/lottery/analizy?start=${start}&end=${end}&danshuang=${daxiaodanshuang}`
-  }
-
+  // var daxiaodanshuang = $("#daxiaodanshaung").val();
+  // var url;
+  // if (daxiaodanshuang == "大" || daxiaodanshuang == "小") {
+  //   url = `/api/v1/lottery/analizy?start=${start}&end=${end}&daxiao=${daxiaodanshuang}`
+  // } else if (daxiaodanshuang == "单" || daxiaodanshuang == "双") {
+  //   url = `/api/v1/lottery/analizy?start=${start}&end=${end}&danshuang=${daxiaodanshuang}`
+  // }
   $.ajax({
-      url: url
+      url: `/api/v1/lottery/analizy/all?start=${start}&end=${end}`
     }).done(function(res) {
       console.log(res.total);
       console.log(res.analizyList);
 
       $("#AnalizyResult .totalGame").html(res.total);
       $("#AnalizyResult .analizyList").html('');
-      if (res.analizyList && res.analizyList.length > 0) {
-        res.analizyList.forEach((v, k) => {
-          $("#AnalizyResult .analizyList").append(`连续${k+1}次中奖：${v}次 <br/>`)
-        });
+      if (res.total > 0 && res.analizyList) {
+        for (let i = 0; i < 15; i++) {
+          $("#AnalizyResult .analizyList").append(`
+          <div class=\"row\">
+            <div class=\"col-sm-2\">${i+1}次</div>
+            <div class=\"col-sm-2\">${res.analizyList.daResult[i]}%</div>
+            <div class=\"col-sm-2\">${res.analizyList.xiaoResult[i]}%</div>
+            <div class=\"col-sm-2\">${res.analizyList.danResult[i]}%</div>
+            <div class=\"col-sm-2\">${res.analizyList.shuangResult[i]}%</div>
+          </div>
+          `)
+        }
       }
     });
 }

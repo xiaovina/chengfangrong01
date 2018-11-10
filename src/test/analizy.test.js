@@ -11,6 +11,8 @@ const run = async() => {
     await eosLottery.dealAnalizy(list, '小');
     await eosLottery.dealAnalizy(list, null, '单');
     await eosLottery.dealAnalizy(list, null, '双');
+
+    await eosLottery.dealAnalizyAll(list);
   } catch (err) {
     logger.error(err);
   }
