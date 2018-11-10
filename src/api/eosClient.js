@@ -3,53 +3,39 @@ const { Api, JsonRpc, JsSignatureProvider } = require('eosjs');
 const fetch = require('node-fetch');
 const { TextDecoder, TextEncoder } = require('text-encoding');
 
-const privateKey = "";
-const signatureProvider = new JsSignatureProvider([privateKey]);
-const rpc = new JsonRpc('https://api.eosnewyork.io', { fetch });
-const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
-
-// 转账操作
-const transfer = async () => {
-  const result = await api.transact({
-    actions: [{
-      account: 'eosio.token',
-      name: 'transfer',
-      authorization: [{
-        actor: 'loveboyggggg', // TODO: para
-        permission: 'active',
-      }],
-      data: {
-        from: 'loveboyggggg', // TODO: para
-        to: 'eosplaybrand', // TODO: para
-        quantity: '0.1000 EOS', // TODO: para
-        memo: 'lottery:s', // TODO: para
-      },
-    }]
-  }, {
-    blocksBehind: 3,
-    expireSeconds: 30,
-  });
-  console.log(result);
-};
-
-
-const run = () => {
-  logger.info("process start...");
-
-  transfer().catch(err=>{
-    console.log("transfer error: ",err)
-  });
-
-  try {
-  } catch (err) {
-    logger.error(err);
+class EosClient {
+  constructor() {}
+  _constructorApi(privateKey) {
+    const signatureProvider = new JsSignatureProvider([privateKey]);
+    const rpc = new JsonRpc('https://api.eosnewyork.io', { fetch });
+    return new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
   }
-  logger.info("process done")
-  process.exit();
+  // 转账操作
+  async transfer(privateKey, actor, quantity, daxiaodanshuang) {
+    const api = this._constructorApi(privateKey);
+    const result = await api.transact({
+      actions: [{
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+          actor: actor,
+          permission: 'active',
+        }],
+        data: {
+          from: actor,
+          to: 'eosplaybrand',
+          quantity: `${quantity} EOS`,
+          memo: `lottery:${daxiaodanshuang}`,
+        },
+      }]
+    }, {
+      blocksBehind: 3,
+      expireSeconds: 30,
+    });
+    console.log(result);
+    return result;
+  };
 }
 
-
-run()
-
-
-
+const eosClient = new EosClient()
+module.exports = eosClient

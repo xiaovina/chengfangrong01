@@ -1,11 +1,44 @@
 const Router = require('koa-router')
 const eosLotteryServices = require('../api/eosLottery')
+const eosClient = require('../api/eosClient')
 const moment = require('moment');
 
 const router = new Router({
   prefix: '/lottery'
 })
 
+
+router.post('/eos/transfer', async ctx => {
+  let result = {};
+  const { privateKey, actor, quantity, daxiaodanshuang } = ctx.request.body;
+  let flag = true;
+  if (!privateKey || privateKey.length < 51) {
+    flag = false
+    ctx.body = "私钥 is required";
+  }
+  if (!actor || actor.length < 12) {
+    flag = false
+    ctx.body = "账号 is required";
+  }
+  if (quantity < 0.0001) {
+    flag = false
+    ctx.body = "金额 须大于0.0001";
+  }
+  if (!daxiaodanshuang) {
+    flag = false
+    ctx.body = "大小 is required";
+  }
+
+  if (flag) {
+    try {
+      result = await eosClient.transfer(privateKey, actor, quantity, daxiaodanshuang);
+    } catch (err) {
+      ctx.body = err
+    }
+    // todo handel result
+    ctx.body = result
+  }
+})
 
 router.get('/analizy', async ctx => {
   let result = { total:0, analizyList: [] };

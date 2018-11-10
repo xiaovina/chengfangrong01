@@ -35,7 +35,48 @@
           <button type="button" class="btn btn-primary" onclick="doAnalizy()" style="margin-top:38px;">分析</button>
       </div>
     </div>
+    <hr/>
     <div class="row">
+      <div class="form-group col-sm-4">
+          <label for="end" class="col-sm-4 col-form-label">私钥：</label>
+          <div class="row col-sm-8">
+          <input type="text" class="col-sm form-control" id="privateKey" placeholder="51位私钥" required>
+        </div>
+      </div>
+      <div class="form-group col-sm-4">
+          <label for="end" class="col-sm-4 col-form-label">用户名：</label>
+          <div class="row col-sm-8">
+          <input type="text" class="col-sm form-control" id="actor" placeholder="12位用户名" required>
+        </div>
+      </div>
+      <div class="form-group col-sm-4">
+          <label for="end" class="col-sm-4 col-form-label">金额：</label>
+          <div class="row col-sm-8">
+          <input type="number" max="10.0000" min="0.0001" class="col-sm form-control" id="quantity" placeholder="0.0001起" required>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-sm-4">
+        <label class="radio-inline col-sm-3">
+          <input type="radio" name="optionsRadiosDaxiao" id="optionsRadiosDa" value="b"> 大
+        </label>
+        <label class="radio-inline col-sm-3">
+          <input type="radio" name="optionsRadiosDaxiao" id="optionsRadiosXiao"  value="s"> 小
+        </label>
+      </div>
+      <div class="form-group col-sm-4">
+        <label class="radio-inline col-sm-3">
+          <input type="radio" name="optionsRadiosDanShuang" id="optionsRadiosDan" value="o"> 单
+        </label>
+        <label class="radio-inline col-sm-3">
+          <input type="radio" name="optionsRadiosDanShuang" id="optionsRadiosShuang"  value="e"> 双
+        </label>
+      </div>
+      <div class="form-group col-sm-4">
+          <button type="button" class="btn btn-primary" onclick="doTransfer()">下注</button>
+          <p id="transferResult" style="color: red;"></p>
+      </div>
     </div>
   </form>
 
@@ -115,5 +156,59 @@ function doAnalizy() {
     });
 }
 
+function doTransfer() {
+  var privateKey = $("#privateKey").val();
+  console.log(privateKey);
+  var actor = $("#actor").val();
+  console.log(actor);
+  var quantity = $("#quantity").val();
+  console.log(quantity);
+  var optionsRadiosDaxiao = $("input[name=optionsRadiosDaxiao]:checked").val();
+  console.log(optionsRadiosDaxiao);
+  var optionsRadiosDanShuang = $("input[name=optionsRadiosDanShuang]:checked").val();
+  console.log(optionsRadiosDanShuang);
+
+  var flag = true;
+  if (!privateKey || privateKey.length != 51) {
+    flag = false;
+  }
+  if (!actor || actor.length != 12) {
+    flag = false;
+  }
+  if (!quantity || quantity < 0.0001 || quantity > 100) {
+    flag = false;
+  }
+  if(!optionsRadiosDaxiao && !optionsRadiosDanShuang) {
+    flag = false;
+  }
+
+  let data = {
+    privateKey,
+    actor,
+    quantity
+  }
+  $("#transferResult").html('');
+  if (optionsRadiosDaxiao) {
+    data.daxiaodanshuang = optionsRadiosDaxiao
+    postTransfer(data);
+  }
+
+  if (optionsRadiosDanShuang) {
+    data.daxiaodanshuang = optionsRadiosDanShuang
+    postTransfer(data);
+  }
+
+}
+
+function postTransfer(data) {
+  $.ajax({
+      url: `/api/v1/lottery/eos/transfer`,
+      method: 'post',
+      data: data
+    }).done(function(res) {
+      console.log(res);
+      $("#transferResult").append(res);
+    });
+}
 </script>
 </html>
