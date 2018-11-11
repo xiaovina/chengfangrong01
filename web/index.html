@@ -263,7 +263,7 @@ function getNonstop() {
         $("#nonstopDanShuang").html(res[1].daxiaodanshaung)
         $("#nonstopDanShuangTimes").html(res[1].nonstopCount)
 
-        _sleep(30000).then(() => {
+        _sleep(10000).then(() => {
           getNonstop();
         })
       }
