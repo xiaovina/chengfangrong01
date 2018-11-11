@@ -24,5 +24,9 @@ module.exports = {
   },
   log: {
     level: 'debug',
+  },
+  eos: {
+    api: 'http://junglehistory.cryptolions.io:18888',
+    toUser: 'tmdqqqqqqqqq'
   }
 }

@@ -5,11 +5,11 @@
   <title>EOS Analizy tool</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css" />
-  <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
-  <script src="https://jonthornton.github.io/jquery-timepicker/jquery.timepicker.js"></script>
-  <link rel="stylesheet" type="text/css" href="https://jonthornton.github.io/jquery-timepicker/jquery.timepicker.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
-  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.standalone.css" />
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery.timepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/jquery.timepicker.min.css" />
+  <script src="js/bootstrap-datepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.standalone.min.css" />
   <script src="js/datepair.min.js"></script>
   <script src="js/jquery.datepair.min.js"></script>
 </head>
@@ -74,12 +74,21 @@
         </label>
       </div>
       <div class="form-group col-sm-4">
-          <button type="button" class="btn btn-primary" onclick="doTransfer()">下注</button>
+          <button type="button" class="btn btn-primary" onclick="doTransfer()">投注</button>
           <p id="transferResult" style="color: red;"></p>
       </div>
     </div>
   </form>
 
+  <hr/>
+  <div class="row">
+    <div class="col-sm-2">
+      目前连<span id="nonstopDaXiao" style="color: red"></span><span id="nonstopDaXiaoTimes" style="color: red"></span>次;
+    </div>
+    <div class="col-sm-2">
+      目前连<span id="nonstopDanShuang" style="color: red"></span><span id="nonstopDanShuangTimes"  style="color: red"></span>次;
+    </div>
+  </div>
   <hr/>
 
   <div class="container" id="AnalizyResult">
@@ -99,21 +108,31 @@
   </div>
 </body>
 <script>
-// initialize input widgets first
-$('#AnalizyForm .time').timepicker({
-    'showDuration': true,
-    'timeFormat': 'H:i'
-});
 
-$('#AnalizyForm .date').datepicker({
-    'format': 'm/d/yyyy',
-    'autoclose': true
-});
 
-// initialize datepair
-var basicExampleEl = document.getElementById('AnalizyForm');
-var datepair = new Datepair(basicExampleEl);
+$(function(){
+  console.log('init');
+  // initialize input widgets first
+  $('#AnalizyForm .time').timepicker({
+      'showDuration': true,
+      'timeFormat': 'H:i'
+  });
 
+  $('#AnalizyForm .date').datepicker({
+      'format': 'm/d/yyyy',
+      'autoclose': true
+  });
+
+  // initialize datepair
+  var basicExampleEl = document.getElementById('AnalizyForm');
+  var datepair = new Datepair(basicExampleEl);
+
+  getNonstop();
+})
+
+function _sleep(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
 function doAnalizy() {
   var startDate = $("#startDate").val();
   var startTime = $("#startTime").val();
@@ -187,17 +206,20 @@ function doTransfer() {
     actor,
     quantity
   }
-  $("#transferResult").html('');
-  if (optionsRadiosDaxiao) {
-    data.daxiaodanshuang = optionsRadiosDaxiao
-    postTransfer(data);
-  }
+  if (flag) {
+    $("#transferResult").html('投注中...');
+    if (optionsRadiosDaxiao) {
+      data.daxiaodanshuang = optionsRadiosDaxiao
+      postTransfer(data);
+    }
 
-  if (optionsRadiosDanShuang) {
-    data.daxiaodanshuang = optionsRadiosDanShuang
-    postTransfer(data);
+    if (optionsRadiosDanShuang) {
+      data.daxiaodanshuang = optionsRadiosDanShuang
+      postTransfer(data);
+    }
+  } else {
+    $("#transferResult").html('请检查投注参数是否正确填写！');
   }
-
 }
 
 function postTransfer(data) {
@@ -207,8 +229,39 @@ function postTransfer(data) {
       data: data
     }).done(function(res) {
       console.log(res);
-      $("#transferResult").append(res);
+      $("#transferResult").html('');
+      if (res && res.transaction_id) {
+        $("#transferResult").append(`投注成功，交易ID为：${res.transaction_id}`);
+      } else {
+        $("#transferResult").append("投注失败，请检查eosplay网站，再重试。");
+      }
     });
 }
+
+function getNonstop() {
+  $("#nonstopDaXiao").html('...')
+  $("#nonstopDaXiaoTimes").html('...')
+  $("#nonstopDanShuang").html('...')
+  $("#nonstopDanShuangTimes").html('...')
+
+  $.ajax({
+      url: `/api/v1/lottery/analizy/nonstop`,
+      method: 'get',
+    }).done(function(res) {
+      console.log(res);
+      $("#transferResult").html('');
+      if (res && res.length === 2) {
+        $("#nonstopDaXiao").html(res[0].daxiaodanshaung)
+        $("#nonstopDaXiaoTimes").html(res[0].nonstopCount)
+        $("#nonstopDanShuang").html(res[1].daxiaodanshaung)
+        $("#nonstopDanShuangTimes").html(res[1].nonstopCount)
+
+        _sleep(30000).then(() => {
+          getNonstop();
+        })
+      }
+    });
+}
+
 </script>
 </html>

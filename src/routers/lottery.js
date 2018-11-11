@@ -31,9 +31,13 @@ router.post('/eos/transfer', async ctx => {
 
   if (flag) {
     try {
-      result = await eosClient.transfer(privateKey, actor, quantity, daxiaodanshuang);
-    } catch (err) {
-      ctx.body = err
+      let amount = Number(quantity).toFixed(4);
+      result = await eosClient.transfer(privateKey, actor, amount, daxiaodanshuang).catch(err=>{
+          console.log("transfer error: ",err)
+          ctx.body = err
+        });;
+    } catch (ex) {
+      ctx.body = ex
     }
     // todo handel result
     ctx.body = result
@@ -68,6 +72,10 @@ router.get('/analizy/all', async ctx => {
     result.total = list.length;
   }
   ctx.body = result
+})
+
+router.get('/analizy/nonstop', async ctx => {
+  ctx.body = await eosLotteryServices.dealTopXX(20);
 })
 
 

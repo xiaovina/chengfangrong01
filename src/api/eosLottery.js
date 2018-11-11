@@ -65,9 +65,93 @@ class EosLottery {
     select daxiao, danshuang from LotteryRecord
       where recordTime > :dateStart
       and recordTime <:dateEnd
+      order by id desc
     `;
     return await db.selectAll(sql, {dateStart, dateEnd});
   }
+
+  async GetLatest(limit) {
+    const sql = `
+      select daxiao, danshuang from LotteryRecord
+      order by id desc limit ${limit}
+    `;
+    return await db.selectAll(sql);
+  }
+  // 最进多连续值
+  async dealTopXX(limit) {
+    const list = await this.GetLatest(limit);
+    console.log(list);
+
+    let result = [];
+    const AnalizyRange = {
+      da: '大',
+      xiao: '小',
+      dan: '单',
+      shuang: '双'
+    };
+
+    let daxiaoList = [];
+    let danshuangList = [];
+    list.forEach(item => {
+      if(item.daxiao === AnalizyRange.da) {
+        daxiaoList.push(1);
+      } else {
+        daxiaoList.push(0);
+      }
+      if(item.danshuang === AnalizyRange.dan) {
+        danshuangList.push(1);
+      } else {
+        danshuangList.push(0);
+      }
+    });
+
+    const daxiaoNonstop = this.getNonstopCode(daxiaoList);
+    logger.info(daxiaoNonstop);
+    if (daxiaoNonstop && daxiaoNonstop.length > 0) {
+      let daxiaodanshaung = '';
+      if (daxiaoNonstop[0][0] === 0) {
+        daxiaodanshaung = AnalizyRange.xiao;
+      } else {
+        daxiaodanshaung = AnalizyRange.da;
+      }
+
+      result.push({
+        daxiaodanshaung,
+        nonstopCount: daxiaoNonstop[0].length
+      });
+    }
+
+    const danshuangNonstop = this.getNonstopCode(danshuangList);
+    logger.info(danshuangNonstop);
+    if (danshuangNonstop && danshuangNonstop.length > 0) {
+
+      let daxiaodanshaung = '';
+      if (danshuangNonstop[0][0] === 0) {
+        daxiaodanshaung = AnalizyRange.shuang;
+      } else {
+        daxiaodanshaung = AnalizyRange.dan;
+      }
+
+      result.push({
+        daxiaodanshaung,
+        nonstopCount: danshuangNonstop[0].length
+      });
+    }
+
+    return result;
+  }
+
+  getNonstopCode(arr){
+    var result = [],
+        i = 0;
+    result[i] = [arr[0]];
+    arr.reduce(function(prev, cur){
+      cur-prev === 0 ? result[i].push(cur) : result[++i] = [cur];
+      return cur;
+    });
+    return result;
+  }
+
 
   async dealAnalizyAll(list) {
     const AnalizyRange = {

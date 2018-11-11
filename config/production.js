@@ -23,5 +23,9 @@ module.exports = {
   },
   log: {
     level: 'debug',
+  },
+  eos: {
+    api: 'https://api.eosnewyork.io',
+    toUser: 'eosplaybrand'
   }
 }
