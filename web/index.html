@@ -52,7 +52,7 @@
       <div class="form-group col-sm-4">
           <label for="end" class="col-sm-4 col-form-label">金额：</label>
           <div class="row col-sm-8">
-          <input type="number" max="10.0000" min="0.0001" class="col-sm form-control" id="quantity" placeholder="0.0001起" required>
+          <input type="number" max="10.0000" min="0.1000" class="col-sm form-control" id="quantity" placeholder="0.1起" value="0.1" required>
         </div>
       </div>
     </div>
@@ -128,6 +128,12 @@ $(function(){
   var datepair = new Datepair(basicExampleEl);
 
   getNonstop();
+
+  var data = dealLocalStorage("get");
+  if (data && data.privateKey && data.actor) {
+    $("#privateKey").val(data.privateKey);
+    $("#actor").val(data.actor);
+  }
 })
 
 function _sleep(milliseconds) {
@@ -207,6 +213,7 @@ function doTransfer() {
     quantity
   }
   if (flag) {
+    dealLocalStorage("set", data);
     $("#transferResult").html('投注中...');
     if (optionsRadiosDaxiao) {
       data.daxiaodanshuang = optionsRadiosDaxiao
@@ -261,6 +268,22 @@ function getNonstop() {
         })
       }
     });
+}
+
+function dealLocalStorage(type, data = null) {
+  if (type === "set") {
+    console.log(data)
+    localStorage.setItem("secret", JSON.stringify(data));
+  } else {
+    const secret = localStorage.getItem("secret");
+    console.log(secret)
+
+    if (secret) {
+      return JSON.parse(secret);
+    } else {
+      return null;
+    }
+  }
 }
 
 </script>
