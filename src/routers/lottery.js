@@ -84,7 +84,7 @@ router.get('/probability/all', async ctx => {
 
 router.get('/probability/slice', async ctx => {
   const { slice } = ctx.request.query;
-  cxt.body = await eosLotteryServices.GetSliceProbability(slice);
+  ctx.body = await eosLotteryServices.GetSliceProbability(slice);
 })
 
 

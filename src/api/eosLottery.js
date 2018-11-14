@@ -501,6 +501,7 @@ class EosLottery {
   }
 
   _sliceMapping(slice) {
+    slice = Number(slice);
     if (slice ===2) {
       return 2;
     }

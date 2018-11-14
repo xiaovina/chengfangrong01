@@ -88,7 +88,58 @@
     <div class="col-sm-2">
       目前连<span id="nonstopDanShuang" style="color: red"></span><span id="nonstopDanShuangTimes"  style="color: red"></span>次;
     </div>
+    <div class="col-sm-6">
+      下一注中奖概率：所有时间平均：<span id="allProbability" style="color: red">-</span>%;
+    </div>
   </div>
+  <hr/>
+
+  <div class="row" style="margin-top: 20px;">
+    <div class="form-group col-sm-12">
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios2" value="2"> 2小时
+      </label>
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios5" value="5"> 5小时
+      </label>
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios8" value="8"> 8小时
+      </label>
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios13" value="13"> 13小时
+      </label>
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios21" value="21"> 21小时
+      </label>
+    </div>
+    <div class="form-group col-sm-12">
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios34" value="34"> 34小时
+      </label>
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios55" value="55"> 55小时
+      </label>
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios89" value="89"> 89小时
+      </label>
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios144" value="144"> 144小时
+      </label>
+      <label class="radio-inline col-sm-2">
+          <input type="radio" name="optionsRadiosFirb" id="optionsRadios233" value="233"> 233小时
+      </label>
+    </div>
+    <div class="form-group col-sm-12">
+      <div class="form-group col-sm-2">
+        <button type="button" class="btn btn-primary" onclick="doSliceAnalizy()">分析</button>
+      </div>
+      <div class="form-group col-sm-8">
+        <span id="slice" style="color: red">-</span>小时总中奖概率<span id="sliceProbability" style="color: red">-</span>%;
+      </div>
+    </div>
+  </div>
+
+
   <hr/>
 
   <div class="container" id="AnalizyResult">
@@ -251,6 +302,7 @@ function getNonstop() {
   $("#nonstopDanShuang").html('...')
   $("#nonstopDanShuangTimes").html('...')
 
+  getAllProbability();
   $.ajax({
       url: `/api/v1/lottery/analizy/nonstop`,
       method: 'get',
@@ -268,6 +320,35 @@ function getNonstop() {
         })
       }
     });
+}
+
+function getAllProbability() {
+  $.ajax({
+      url: `/api/v1/lottery/probability/all`,
+      method: 'get',
+    }).done(function(res) {
+      console.log(res);
+      $("#allProbability").html(res);
+    });
+}
+
+function doSliceAnalizy() {
+  var optionsRadiosFirb = $("input[name=optionsRadiosFirb]:checked").val();
+  console.log(optionsRadiosFirb);
+
+  if (!optionsRadiosFirb) {
+    alert('请选择小时数！');
+    return;
+  } else {
+    $("#slice").html(optionsRadiosFirb);
+    $.ajax({
+      url: `/api/v1/lottery/probability/slice?slice=${optionsRadiosFirb}`,
+      method: 'get',
+    }).done(function(res) {
+      console.log(res);
+      $("#sliceProbability").html(res);
+    });
+  }
 }
 
 function dealLocalStorage(type, data = null) {
