@@ -12,11 +12,10 @@
   "dependencies": {
     "axios": "^0.18.0",
     "co": "^4.6.0",
+    "compute-variance": "^3.0.0",
     "config": "^2.0.1",
     "eosjs": "^20.0.0-beta2",
     "eosjs-ecc": "^4.0.4",
-    "node-fetch": "^2.2.0",
-    "text-encoding": "^0.7.0",
     "humps": "^2.0.1",
     "kmp-matcher": "^0.1.2",
     "koa": "^2.6.1",
@@ -33,7 +32,9 @@
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
     "mysql2": "^1.6.1",
+    "node-fetch": "^2.2.0",
     "sequelize": "^4.39.1",
+    "text-encoding": "^0.7.0",
     "tracer": "^0.9.1",
     "websocket": "^1.0.28",
     "ws": "^6.1.0"

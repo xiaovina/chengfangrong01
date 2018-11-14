@@ -1,5 +1,7 @@
 const eosLottery = require('../api/eosLottery');
 const logger = require('../logger');
+const variance = require('compute-variance');
+
 
 const run = async() => {
   logger.info("process start...");
@@ -14,8 +16,21 @@ const run = async() => {
 
     // await eosLottery.dealAnalizyAll(list);
 
-    const l = await eosLottery.dealTopXX(20);
-    logger.info(l);
+    // const l = await eosLottery.dealTopXX(20);
+    // logger.info(l);
+
+    // const all = await eosLottery.dealAllProbability();
+    // logger.debug(all)
+    // const sp = await eosLottery.dealSliceProbability();
+    // logger.debug(sp)
+
+    // let allp1 = await eosLottery.GetAllProbability();
+    // logger.debug(allp1);
+
+    let allp2 = await eosLottery.GetSliceProbability(2);
+    logger.debug(allp2);
+
+
   } catch (err) {
     logger.error(err);
   }

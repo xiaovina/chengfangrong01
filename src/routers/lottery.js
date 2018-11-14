@@ -78,6 +78,14 @@ router.get('/analizy/nonstop', async ctx => {
   ctx.body = await eosLotteryServices.dealTopXX(20);
 })
 
+router.get('/probability/all', async ctx => {
+  ctx.body = await eosLotteryServices.GetAllProbability();
+})
+
+router.get('/probability/slice', async ctx => {
+  const { slice } = ctx.request.query;
+  cxt.body = await eosLotteryServices.GetSliceProbability(slice);
+})
 
 
 module.exports = router

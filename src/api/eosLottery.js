@@ -77,7 +77,8 @@ class EosLottery {
     `;
     return await db.selectAll(sql);
   }
-  // 最进多连续值
+
+  // 最近多连续值
   async dealTopXX(limit) {
     const list = await this.GetLatest(limit);
     console.log(list);
@@ -152,7 +153,6 @@ class EosLottery {
     return result;
   }
 
-
   async dealAnalizyAll(list) {
     const AnalizyRange = {
       da: '大',
@@ -206,41 +206,6 @@ class EosLottery {
     logger.debug(result)
 
     return result
-  }
-
-  async _analizyItem(str, range01) {
-    let result = [];
-    if(range01 === '1') {
-      str = `0${str}0`;
-    } else {
-      str = `1${str}1`;
-    }
-    logger.debug(str);
-
-    for(let i = 1; i <= 15; i++) {
-      let subStr = range01.repeat(i);
-      if(range01 === '1') {
-        subStr = `0${subStr}0`;
-      } else {
-        subStr = `1${subStr}1`;
-      }
-      result.push(this._matchTimes(str, subStr));
-    }
-    return result;
-  }
-
-  _dealProbability(list) {
-    const denominator = parseFloat(_.sum(list))
-    let result = []
-    logger.debug(denominator)
-
-    list.forEach(item => {
-      let r = (item / denominator);
-      r = r.toFixed(4)*100 / 100;
-      r = (r*100).toFixed(2);
-      result.push(r);
-    });
-    return result;
   }
 
   async dealAnalizy(list, daxiao = null, danshuang = null) {
@@ -310,84 +275,124 @@ class EosLottery {
     return result;
   }
 
-  async dealAnalizy(list, daxiao = null, danshuang = null) {
-    const AnalizyRang = {
-      da: '大',
-      xiao: '小',
-      dan: '单',
-      shuang: '双'
-    };
+  async dealAllProbability() {
+    let total = await this._getTotalRecord();
+    total = total.total
+    const allRecords = await this.GetLatest(total);
+    return await this.dealAnalizyAll(allRecords);
+  }
+
+  async dealSliceProbability() {
     let result = []
-    try {
-      if (list && list.length > 0) {
-        if (daxiao) {
-          let daxiaoStr = list.map(o => o.daxiao).join('');
-          logger.debug(daxiaoStr);
-
-          if (daxiao === AnalizyRang.da) {
-            daxiaoStr = `小${daxiaoStr}小`;
-              logger.debug(daxiaoStr);
-
-            for(let i = 1; i <= 15; i++) {
-              const daStr = AnalizyRang.da.repeat(i);
-              const daSubString = `小${daStr}小`;
-              result.push(this._matchTimes(daxiaoStr, daSubString));
-            }
-          } else if (daxiao === AnalizyRang.xiao) {
-            daxiaoStr = `大${daxiaoStr}大`;
-            logger.debug(daxiaoStr);
-
-            for(let i = 1; i <= 15; i++) {
-              const xiaoStr = AnalizyRang.xiao.repeat(i);
-              const xiaoSubString = `大${xiaoStr}大`;
-              result.push(this._matchTimes(daxiaoStr, xiaoSubString));
-            }
-          }
-        } else if (danshuang) {
-          let danshuangStr = list.map(o => o.danshuang).join('');
-          logger.debug(danshuangStr);
-
-          if (danshuang === AnalizyRang.dan) {
-            danshuangStr = `双${danshuangStr}双`;
-            logger.debug(danshuangStr);
-
-            for(let i = 1; i <= 15; i++) {
-              const danStr = AnalizyRang.dan.repeat(i);
-              const danSubString = `双${danStr}双`;
-              result.push(this._matchTimes(danshuangStr, danSubString));
-            }
-          } else if (danshuang === AnalizyRang.shuang) {
-            danshuangStr = `单${danshuangStr}单`;
-            logger.debug(danshuangStr);
-
-            for(let i = 1; i <= 15; i++) {
-              const shaungStr = AnalizyRang.shuang.repeat(i);
-              const shuangSubString = `单${shaungStr}单`;
-              result.push(this._matchTimes(danshuangStr, shuangSubString));
-            }
-          }
-        }
-      }
-
-    } catch (err) {
-      logger.error(err);
+    const slice = [1, 3, 5, 13, 21, 34, 55, 89, 144, 233];
+    for (const v of slice) {
+      const allRecords = await this.GetLatest(v * 60);
+      const p = await this.dealAnalizyAll(allRecords);
+      result.push({ v, p });
     }
-
-    logger.debug(result);
     return result;
   }
 
-  _matchTimes(mainString, subString) {
-    const match =  kmp(mainString, subString);
-    if(match && match.length) {
-      return match.length;
-    } else {
-      return 0;
+  async GetAllProbability() {
+    let probabilityList = []
+    const nonstop = await this.dealTopXX(20);
+    const all = await this.dealAllProbability();
+
+    for (const nonstopItem of nonstop) {
+      if (nonstopItem.daxiaodanshaung === '大') {
+        probabilityList.push(all.xiaoResult[nonstopItem.nonstopCount-1]);
+      } else if (nonstopItem.daxiaodanshaung === '小') {
+        probabilityList.push(all.daResult[nonstopItem.nonstopCount-1]);
+      } else if (nonstopItem.daxiaodanshaung === '单') {
+        probabilityList.push(all.shuangResult[nonstopItem.nonstopCount-1]);
+      } else if (nonstopItem.daxiaodanshaung === '双') {
+        probabilityList.push(all.danResult[nonstopItem.nonstopCount-1]);
+      }
+    }
+
+    logger.debug(probabilityList);
+
+    // _average
+    logger.debug('_average', this._average(probabilityList))
+    return this._average(probabilityList);
+  }
+
+  async GetSliceProbability(slice) {
+    let probabilityList = []
+    const nonstop = await this.dealTopXX(20);
+    const allRecords = await this.GetLatest(slice * 60);
+    const all = await this.dealAnalizyAll(allRecords);
+    const totalStatisticsNumbers = this._sliceMapping(slice);
+
+    for (const nonstopItem of nonstop) {
+      if (nonstopItem.daxiaodanshaung === '大') {
+        let totalContinuousP = all.daResult[nonstopItem.nonstopCount-1];
+        let p = [];
+        for (let i=1; i < totalStatisticsNumbers; i++) {
+          p.push(all.xiaoResult[i])
+        }
+        probabilityList.push(totalContinuousP + this._average(p))
+      } else if (nonstopItem.daxiaodanshaung === '小') {
+        let totalContinuousP = all.xiaoResult[nonstopItem.nonstopCount-1];
+        let p = [];
+        for (let i=1; i < totalStatisticsNumbers; i++) {
+          p.push(all.daResult[i])
+        }
+        probabilityList.push(totalContinuousP + this._average(p))
+      } else if (nonstopItem.daxiaodanshaung === '单') {
+        let totalContinuousP = all.danResult[nonstopItem.nonstopCount-1];
+        let p = [];
+        for (let i=1; i < totalStatisticsNumbers; i++) {
+          p.push(all.shuangResult[i])
+        }
+        probabilityList.push(totalContinuousP + this._average(p))
+      } else if (nonstopItem.daxiaodanshaung === '双') {
+        let totalContinuousP = all.shuangResult[nonstopItem.nonstopCount-1];
+        let p = [];
+        for (let i=1; i < totalStatisticsNumbers; i++) {
+          p.push(all.danResult[i])
+        }
+        probabilityList.push(totalContinuousP + this._average(p))
+      }
+    }
+
+    logger.debug(probabilityList);
+
+    // _average
+    return this._average(probabilityList);
+  }
+
+  async _fibonacciVariance(sliceProbability) {
+    const result = {
+      daResult: [],
+      xiaoResult: [],
+      danResult: [],
+      shuangResult: [],
+    }
+
+    const totalArray = {
+      daArray: [],
+      xiaoArray: [],
+      danArray: [],
+      shuangArray: [],
+    }
+    let data = new Int8Array(15);
+
+    for (const sliceP of sliceProbability) {
+      for (let j of data) {
+        for (let i of data) {
+          totalArray.daArray[j].push(sliceP.p.daResult[i])
+          totalArray.xiaoArray[j].push(sliceP.p.xiaoResult[i])
+          totalArray.danArray[j].push(sliceP.p.danResult[i])
+          totalArray.shuangArray[j].push(sliceP.p.shuangResult[i])
+        }
+      }
     }
   }
 
-  async SyncLottery() {
-    // TODO sync by gamme id range
+  async _getTotalRecord() {
+    const sql = `select count(1) as total from LotteryRecord;`
+    return await db.selectOne(sql);
   }
 
   async _getList(lower_bound, upper_bound, limit) {
@@ -422,6 +427,50 @@ class EosLottery {
     return await db.selectOne(sql);
   }
 
+  async _analizyItem(str, range01) {
+    let result = [];
+    if(range01 === '1') {
+      str = `0${str}0`;
+    } else {
+      str = `1${str}1`;
+    }
+    logger.debug(str);
+
+    for(let i = 1; i <= 15; i++) {
+      let subStr = range01.repeat(i);
+      if(range01 === '1') {
+        subStr = `0${subStr}0`;
+      } else {
+        subStr = `1${subStr}1`;
+      }
+      result.push(this._matchTimes(str, subStr));
+    }
+    return result;
+  }
+
+  _matchTimes(mainString, subString) {
+    const match =  kmp(mainString, subString);
+    if(match && match.length) {
+      return match.length;
+    } else {
+      return 0;
+    }
+  }
+
+  _dealProbability(list) {
+    const denominator = parseFloat(_.sum(list))
+    let result = []
+    logger.debug(denominator)
+
+    list.forEach(item => {
+      let r = (item / denominator);
+      r = r.toFixed(4)*100 / 100;
+      r = parseFloat((r*100).toFixed(2));
+      result.push(r);
+    });
+    return result;
+  }
+
   //填充截取法
   _resultHandel(result) {
     //这里用slice和substr均可
@@ -441,6 +490,46 @@ class EosLottery {
       return "双";
     } else {
       return "单";
+    }
+  }
+
+  _average(data) {
+    let count = data.length;
+    data = data.reduce((previous, current) => current += previous);
+    let average = data /= count;
+    return parseFloat(average.toFixed(2));
+  }
+
+  _sliceMapping(slice) {
+    if (slice ===2) {
+      return 2;
+    }
+    if (slice ===5) {
+      return 3;
+    }
+    if (slice ===8) {
+      return 3;
+    }
+    if (slice ===13) {
+      return 4;
+    }
+    if (slice ===21) {
+      return 4;
+    }
+    if (slice ===34) {
+      return 5;
+    }
+    if (slice ===55) {
+      return 5;
+    }
+    if (slice ===89) {
+      return 6;
+    }
+    if (slice ===144) {
+      return 8;
+    }
+    if (slice ===233) {
+      return 9;
     }
   }
 }
