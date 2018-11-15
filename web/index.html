@@ -89,7 +89,10 @@
       目前连<span id="nonstopDanShuang" style="color: red"></span><span id="nonstopDanShuangTimes"  style="color: red"></span>次;
     </div>
     <div class="col-sm-6" id="allProbability" style="height: 92px;">
-      <!-- 下一注中奖概率：所有时间平均：<span id="allProbability" style="color: red">-</span>%; <br/> -->
+      下一注投大中奖概率：所有时间平均：<span id="allProbability-0" style="color: red">-</span>%; <br/>
+      下一注投小中奖概率：所有时间平均：<span id="allProbability-1" style="color: red">-</span>%; <br/>
+      下一注投单中奖概率：所有时间平均：<span id="allProbability-2" style="color: red">-</span>%; <br/>
+      下一注投双中奖概率：所有时间平均：<span id="allProbability-3" style="color: red">-</span>%; <br/>
     </div>
   </div>
   <hr/>
@@ -323,16 +326,15 @@ function getNonstop() {
 }
 
 function getAllProbability() {
-  $("#allProbability").html('');
   $.ajax({
       url: `/api/v1/lottery/probability/all`,
       method: 'get',
     }).done(function(res) {
       console.log(res);
       if (res && res.length > 0) {
-        for (let r of res) {
+        for (let r in res) {
           console.log(r)
-          $("#allProbability").append(`下一注投${r.dxds}中奖概率：所有时间平均：<span style="color: red">${r.p}</span>%; <br/>`);
+          $(`#allProbability-${r}`).html(res[r].p);
         }
       }
     });
