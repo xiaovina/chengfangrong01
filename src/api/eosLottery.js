@@ -358,7 +358,7 @@ class EosLottery {
 
     for (const nonstopItem of nonstop) {
       if (nonstopItem.daxiaodanshaung === '大') {
-        let totalContinuousP = all.daResult[nonstopItem.nonstopCount-1];
+        let totalContinuousP = all.daResult[nonstopItem.nonstopCount];
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.xiaoResult[i])
@@ -366,14 +366,14 @@ class EosLottery {
         let tp = totalContinuousP + this._average(p);
         probabilityList.push({
           dxds: '大',
-          p: 100 - tp
+          p: tp
         });
         probabilityList.push({
           dxds: '小',
-          p: tp
+          p: 100 - tp
         });
       } else if (nonstopItem.daxiaodanshaung === '小') {
-        let totalContinuousP = all.xiaoResult[nonstopItem.nonstopCount-1];
+        let totalContinuousP = all.xiaoResult[nonstopItem.nonstopCount];
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.daResult[i])
@@ -381,14 +381,14 @@ class EosLottery {
         let tp = totalContinuousP + this._average(p);
         probabilityList.push({
           dxds: '大',
-          p: tp
+          p: 100 - tp
         });
         probabilityList.push({
           dxds: '小',
-          p: 100 - tp
+          p: tp
         });
       } else if (nonstopItem.daxiaodanshaung === '单') {
-        let totalContinuousP = all.danResult[nonstopItem.nonstopCount-1];
+        let totalContinuousP = all.danResult[nonstopItem.nonstopCount];
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.shuangResult[i])
@@ -396,14 +396,14 @@ class EosLottery {
         let tp = totalContinuousP + this._average(p);
         probabilityList.push({
           dxds: '单',
-          p: 100 - tp
+          p: tp
         });
         probabilityList.push({
           dxds: '双',
-          p: tp
+          p: 100 - tp
         });
       } else if (nonstopItem.daxiaodanshaung === '双') {
-        let totalContinuousP = all.shuangResult[nonstopItem.nonstopCount-1];
+        let totalContinuousP = all.shuangResult[nonstopItem.nonstopCount];
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.danResult[i])
@@ -411,11 +411,11 @@ class EosLottery {
         let tp = totalContinuousP + this._average(p);
         probabilityList.push({
           dxds: '单',
-          p: tp
+          p: 100 - tp
         });
         probabilityList.push({
           dxds: '双',
-          p: 100 - tp
+          p: tp
         });
       }
     }
