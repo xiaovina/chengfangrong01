@@ -300,40 +300,76 @@ class EosLottery {
 
     for (const nonstopItem of nonstop) {
       if (nonstopItem.daxiaodanshaung === '大') {
+        let before = all.daResult.filter(( v, k ) => {
+          if ( k < nonstopItem.nonstopCount ) return v;
+        }).reduce(( a, b ) =>
+          a + b
+        );
+
+        if (before > 80) {
+          before *= 0.8;
+        }
         probabilityList.push({
           dxds: '大',
-          p: all.daResult[nonstopItem.nonstopCount]
+          p: 100 - before
         });
         probabilityList.push({
           dxds: '小',
-          p: 100 - all.daResult[nonstopItem.nonstopCount]
+          p: before
         });
       } else if (nonstopItem.daxiaodanshaung === '小') {
+        let before = all.xiaoResult.filter(( v, k ) => {
+          if ( k < nonstopItem.nonstopCount ) return v;
+        }).reduce(( a, b ) =>
+          a + b
+        );
+
+        if (before > 80) {
+          before *= 0.8;
+        }
         probabilityList.push({
           dxds: '大',
-          p: 100 - all.xiaoResult[nonstopItem.nonstopCount]
+          p: before
         });
         probabilityList.push({
           dxds: '小',
-          p: all.xiaoResult[nonstopItem.nonstopCount]
+          p: 100 - before
         });
       } else if (nonstopItem.daxiaodanshaung === '单') {
+        let before = all.danResult.filter(( v, k ) => {
+          if ( k < nonstopItem.nonstopCount ) return v;
+        }).reduce(( a, b ) =>
+          a + b
+        );
+
+        if (before > 80) {
+          before *= 0.8;
+        }
         probabilityList.push({
           dxds: '单',
-          p: all.danResult[nonstopItem.nonstopCount]
+          p: 100 - before
         });
         probabilityList.push({
           dxds: '双',
-          p: 100 - all.danResult[nonstopItem.nonstopCount]
+          p: before
         });
       } else if (nonstopItem.daxiaodanshaung === '双') {
+        let before = all.shuangResult.filter(( v, k ) => {
+          if ( k < nonstopItem.nonstopCount ) return v;
+        }).reduce(( a, b ) =>
+          a + b
+        );
+
+        if (before > 80) {
+          before *= 0.8;
+        }
         probabilityList.push({
           dxds: '单',
-          p: 100 - all.shuangResult[nonstopItem.nonstopCount]
+          p: before
         });
         probabilityList.push({
           dxds: '双',
-          p: all.shuangResult[nonstopItem.nonstopCount]
+          p: 100 - before
         });
       }
     }
@@ -358,7 +394,17 @@ class EosLottery {
 
     for (const nonstopItem of nonstop) {
       if (nonstopItem.daxiaodanshaung === '大') {
-        let totalContinuousP = all.daResult[nonstopItem.nonstopCount];
+
+        let after = all.daResult.filter(( v, k ) => {
+          if ( k >= nonstopItem.nonstopCount ) return v;
+        }).reduce(( a, b ) =>
+          a + b
+        );
+        if (after < 20) {
+          after *= 1.5;
+        }
+
+        let totalContinuousP = after;
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.xiaoResult[i])
@@ -373,7 +419,16 @@ class EosLottery {
           p: 100 - tp
         });
       } else if (nonstopItem.daxiaodanshaung === '小') {
-        let totalContinuousP = all.xiaoResult[nonstopItem.nonstopCount];
+        let after = all.xiaoResult.filter(( v, k ) => {
+          if ( k >= nonstopItem.nonstopCount ) return v;
+        }).reduce(( a, b ) =>
+          a + b
+        );
+        if (after < 20) {
+          after *= 1.5;
+        }
+
+        let totalContinuousP = after;
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.daResult[i])
@@ -388,7 +443,16 @@ class EosLottery {
           p: tp
         });
       } else if (nonstopItem.daxiaodanshaung === '单') {
-        let totalContinuousP = all.danResult[nonstopItem.nonstopCount];
+        let after = all.danResult.filter(( v, k ) => {
+          if ( k >= nonstopItem.nonstopCount ) return v;
+        }).reduce(( a, b ) =>
+          a + b
+        );
+        if (after < 20) {
+          after *= 1.5;
+        }
+
+        let totalContinuousP = after;
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.shuangResult[i])
@@ -403,7 +467,16 @@ class EosLottery {
           p: 100 - tp
         });
       } else if (nonstopItem.daxiaodanshaung === '双') {
-        let totalContinuousP = all.shuangResult[nonstopItem.nonstopCount];
+        let after = all.shuangResult.filter(( v, k ) => {
+          if ( k >= nonstopItem.nonstopCount ) return v;
+        }).reduce(( a, b ) =>
+          a + b
+        );
+        if (after < 20) {
+          after *= 1.5;
+        }
+
+        let totalContinuousP = after;
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.danResult[i])
