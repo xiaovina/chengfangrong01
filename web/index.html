@@ -88,8 +88,8 @@
     <div class="col-sm-2">
       目前连<span id="nonstopDanShuang" style="color: red"></span><span id="nonstopDanShuangTimes"  style="color: red"></span>次;
     </div>
-    <div class="col-sm-6">
-      下一注中奖概率：所有时间平均：<span id="allProbability" style="color: red">-</span>%;
+    <div class="col-sm-6" id="allProbability" style="height: 92px;">
+      <!-- 下一注中奖概率：所有时间平均：<span id="allProbability" style="color: red">-</span>%; <br/> -->
     </div>
   </div>
   <hr/>
@@ -133,8 +133,8 @@
       <div class="form-group col-sm-2">
         <button type="button" class="btn btn-primary" onclick="doSliceAnalizy()">分析</button>
       </div>
-      <div class="form-group col-sm-8">
-        <span id="slice" style="color: red">-</span>小时总中奖概率<span id="sliceProbability" style="color: red">-</span>%;
+      <div class="form-group col-sm-8" id="sliceProbability" style="height: 92px;"></div>
+        <!-- <span id="slice" style="color: red">-</span>小时总中奖概率<span id="sliceProbability" style="color: red">-</span>%;<br/> -->
       </div>
     </div>
   </div>
@@ -323,12 +323,18 @@ function getNonstop() {
 }
 
 function getAllProbability() {
+  $("#allProbability").html('');
   $.ajax({
       url: `/api/v1/lottery/probability/all`,
       method: 'get',
     }).done(function(res) {
       console.log(res);
-      $("#allProbability").html(res);
+      if (res && res.length > 0) {
+        for (let r of res) {
+          console.log(r)
+          $("#allProbability").append(`下一注投${r.dxds}中奖概率：所有时间平均：<span style="color: red">${r.p}</span>%; <br/>`);
+        }
+      }
     });
 }
 
@@ -340,13 +346,19 @@ function doSliceAnalizy() {
     alert('请选择小时数！');
     return;
   } else {
-    $("#slice").html(optionsRadiosFirb);
+    $("#sliceProbability").html('');
     $.ajax({
       url: `/api/v1/lottery/probability/slice?slice=${optionsRadiosFirb}`,
       method: 'get',
     }).done(function(res) {
       console.log(res);
-      $("#sliceProbability").html(res);
+      if (res && res.length > 0) {
+        for (let r of res) {
+          console.log(r)
+          $("#sliceProbability").append(`<span style="color: red">${optionsRadiosFirb}</span>小时投注${r.dxds}的中奖概率<span id="sliceProbability" style="color: red">${r.p}</span>%;<br/>`);
+        }
+      }
+
     });
   }
 }

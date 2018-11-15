@@ -300,21 +300,53 @@ class EosLottery {
 
     for (const nonstopItem of nonstop) {
       if (nonstopItem.daxiaodanshaung === '大') {
-        probabilityList.push(all.xiaoResult[nonstopItem.nonstopCount-1]);
+        probabilityList.push({
+          dxds: '大',
+          p: 100 - all.daResult[nonstopItem.nonstopCount-1]
+        });
+        probabilityList.push({
+          dxds: '小',
+          p: all.daResult[nonstopItem.nonstopCount-1]
+        });
       } else if (nonstopItem.daxiaodanshaung === '小') {
-        probabilityList.push(all.daResult[nonstopItem.nonstopCount-1]);
+        probabilityList.push({
+          dxds: '大',
+          p: all.xiaoResult[nonstopItem.nonstopCount-1]
+        });
+        probabilityList.push({
+          dxds: '小',
+          p: 100 - all.xiaoResult[nonstopItem.nonstopCount-1]
+        });
       } else if (nonstopItem.daxiaodanshaung === '单') {
-        probabilityList.push(all.shuangResult[nonstopItem.nonstopCount-1]);
+        probabilityList.push({
+          dxds: '单',
+          p: 100 - all.danResult[nonstopItem.nonstopCount-1]
+        });
+        probabilityList.push({
+          dxds: '双',
+          p: all.danResult[nonstopItem.nonstopCount-1]
+        });
       } else if (nonstopItem.daxiaodanshaung === '双') {
-        probabilityList.push(all.danResult[nonstopItem.nonstopCount-1]);
+        probabilityList.push({
+          dxds: '双',
+          p: 100 - all.shuangResult[nonstopItem.nonstopCount-1]
+        });
+        probabilityList.push({
+          dxds: '单',
+          p: all.shuangResult[nonstopItem.nonstopCount-1]
+        });
       }
     }
 
+    for (let item of probabilityList) {
+      item.p = parseFloat(item.p.toFixed(2));
+    }
     logger.debug(probabilityList);
 
+    return probabilityList;
     // _average
-    logger.debug('_average', this._average(probabilityList))
-    return this._average(probabilityList);
+    // logger.debug('_average', this._average(probabilityList))
+    // return this._average(probabilityList);
   }
 
   async GetSliceProbability(slice) {
@@ -331,35 +363,71 @@ class EosLottery {
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.xiaoResult[i])
         }
-        probabilityList.push(totalContinuousP + this._average(p))
+        let tp = totalContinuousP + this._average(p);
+        probabilityList.push({
+          dxds: '大',
+          p: 100 - tp
+        });
+        probabilityList.push({
+          dxds: '小',
+          p: tp
+        });
       } else if (nonstopItem.daxiaodanshaung === '小') {
         let totalContinuousP = all.xiaoResult[nonstopItem.nonstopCount-1];
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.daResult[i])
         }
-        probabilityList.push(totalContinuousP + this._average(p))
+        let tp = totalContinuousP + this._average(p);
+        probabilityList.push({
+          dxds: '大',
+          p: tp
+        });
+        probabilityList.push({
+          dxds: '小',
+          p: 100 - tp
+        });
       } else if (nonstopItem.daxiaodanshaung === '单') {
         let totalContinuousP = all.danResult[nonstopItem.nonstopCount-1];
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.shuangResult[i])
         }
-        probabilityList.push(totalContinuousP + this._average(p))
+        let tp = totalContinuousP + this._average(p);
+        probabilityList.push({
+          dxds: '单',
+          p: 100 - tp
+        });
+        probabilityList.push({
+          dxds: '双',
+          p: tp
+        });
       } else if (nonstopItem.daxiaodanshaung === '双') {
         let totalContinuousP = all.shuangResult[nonstopItem.nonstopCount-1];
         let p = [];
         for (let i=1; i < totalStatisticsNumbers; i++) {
           p.push(all.danResult[i])
         }
-        probabilityList.push(totalContinuousP + this._average(p))
+        let tp = totalContinuousP + this._average(p);
+        probabilityList.push({
+          dxds: '单',
+          p: tp
+        });
+        probabilityList.push({
+          dxds: '双',
+          p: 100 - tp
+        });
       }
     }
 
+    for (let item of probabilityList) {
+      item.p = parseFloat(item.p.toFixed(2));
+    }
     logger.debug(probabilityList);
 
+    return probabilityList;
     // _average
-    return this._average(probabilityList);
+    // return this._average(probabilityList);
   }
 
   async _fibonacciVariance(sliceProbability) {
@@ -497,7 +565,9 @@ class EosLottery {
     let count = data.length;
     data = data.reduce((previous, current) => current += previous);
     let average = data /= count;
-    return parseFloat(average.toFixed(2));
+    const av = parseFloat(average.toFixed(2));
+    logger.debug('av', av);
+    return av;
   }
 
   _sliceMapping(slice) {
