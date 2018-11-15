@@ -302,38 +302,38 @@ class EosLottery {
       if (nonstopItem.daxiaodanshaung === '大') {
         probabilityList.push({
           dxds: '大',
-          p: 100 - all.daResult[nonstopItem.nonstopCount-1]
+          p: all.daResult[nonstopItem.nonstopCount]
         });
         probabilityList.push({
           dxds: '小',
-          p: all.daResult[nonstopItem.nonstopCount-1]
+          p: 100 - all.daResult[nonstopItem.nonstopCount]
         });
       } else if (nonstopItem.daxiaodanshaung === '小') {
         probabilityList.push({
           dxds: '大',
-          p: all.xiaoResult[nonstopItem.nonstopCount-1]
+          p: 100 - all.xiaoResult[nonstopItem.nonstopCount]
         });
         probabilityList.push({
           dxds: '小',
-          p: 100 - all.xiaoResult[nonstopItem.nonstopCount-1]
+          p: all.xiaoResult[nonstopItem.nonstopCount]
         });
       } else if (nonstopItem.daxiaodanshaung === '单') {
         probabilityList.push({
           dxds: '单',
-          p: 100 - all.danResult[nonstopItem.nonstopCount-1]
+          p: all.danResult[nonstopItem.nonstopCount]
         });
         probabilityList.push({
           dxds: '双',
-          p: all.danResult[nonstopItem.nonstopCount-1]
+          p: 100 - all.danResult[nonstopItem.nonstopCount]
         });
       } else if (nonstopItem.daxiaodanshaung === '双') {
         probabilityList.push({
-          dxds: '双',
-          p: 100 - all.shuangResult[nonstopItem.nonstopCount-1]
+          dxds: '单',
+          p: 100 - all.shuangResult[nonstopItem.nonstopCount]
         });
         probabilityList.push({
-          dxds: '单',
-          p: all.shuangResult[nonstopItem.nonstopCount-1]
+          dxds: '双',
+          p: all.shuangResult[nonstopItem.nonstopCount]
         });
       }
     }
