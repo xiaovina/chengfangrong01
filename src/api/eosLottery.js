@@ -569,24 +569,24 @@ class EosLottery {
     for (const nonstopItem of nonstop) {
       if (nonstopItem.daxiaodanshaung === '大' || nonstopItem.daxiaodanshaung === '小') {
         if (allSlice.daResult <= all) {
-          let tp = this._comparedP(all, allSlice.daResult);
+          const tp = this._comparedP(all, allSlice.daResult);
           probabilityList.push({
             dxds: '大',
-            p: tp
+            p: 100 - tp
           });
           probabilityList.push({
             dxds: '小',
-            p: 100 - tp
+            p: tp
           });
         } else {
           let tp = this._comparedP(all, allSlice.xiaoResult);
           probabilityList.push({
             dxds: '大',
-            p: 100 - tp
+            p: tp
           });
           probabilityList.push({
             dxds: '小',
-            p: tp
+            p: 100 - tp
           });
         }
       } else {
@@ -594,21 +594,21 @@ class EosLottery {
           let tp = this._comparedP(all, allSlice.danResult);
           probabilityList.push({
             dxds: '单',
-            p: tp
+            p: 100 - tp
           });
           probabilityList.push({
             dxds: '双',
-            p: 100 - tp
+            p: tp
           });
         } else {
           let tp = this._comparedP(all, allSlice.shuangResult);
           probabilityList.push({
             dxds: '单',
-            p: 100 - tp
+            p: tp
           });
           probabilityList.push({
             dxds: '双',
-            p: tp
+            p: 100 - tp
           });
         }
       }
