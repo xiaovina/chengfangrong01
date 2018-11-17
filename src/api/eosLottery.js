@@ -161,6 +161,7 @@ class EosLottery {
   return await db.selectAll(sql);
   }
 
+  // 条件概率统计
   async dealAnalizyAll(list) {
     const AnalizyRange = {
       da: '大',
@@ -210,6 +211,50 @@ class EosLottery {
       xiaoResult: this._dealProbability(xiaoResult),
       danResult: this._dealProbability(danResult),
       shuangResult: this._dealProbability(shuangResult),
+    }
+    logger.debug(result)
+
+    return result
+  }
+
+  // 随机概率统计
+  async dealRandomDXDSAnalizy(list) {
+    const AnalizyRange = {
+      da: '大',
+      da1: 1,
+      xiao: '小',
+      xiao0: 0,
+      dan: '单',
+      dan1: 1,
+      shuang: '双',
+      shuang0: 0
+    };
+
+    let daxiaoList = [];
+    let danshuangList = [];
+    list.forEach(item => {
+      if(item.daxiao === AnalizyRange.da) {
+        daxiaoList.push(1);
+      } else {
+        daxiaoList.push(0);
+      }
+      if(item.danshuang === AnalizyRange.dan) {
+        danshuangList.push(1);
+      } else {
+        danshuangList.push(0);
+      }
+    });
+
+    const daResult = this._dealRandomProbability(daxiaoList, 1);
+    const xiaoResult = 100 - daResult;
+    const danResult = this._dealRandomProbability(danshuangList, 1);
+    const shuangResult = 100 - danResult;
+
+    const result = {
+      daResult,
+      xiaoResult,
+      danResult,
+      shuangResult,
     }
     logger.debug(result)
 
@@ -388,11 +433,9 @@ class EosLottery {
     logger.debug(probabilityList);
 
     return probabilityList;
-    // _average
-    // logger.debug('_average', this._average(probabilityList))
-    // return this._average(probabilityList);
   }
 
+  // 条件概率
   async GetSliceProbability(slice) {
     let probabilityList = []
     const nonstop = await this.dealTopXX(20);
@@ -513,8 +556,73 @@ class EosLottery {
     logger.debug(probabilityList);
 
     return probabilityList;
-    // _average
-    // return this._average(probabilityList);
+  }
+
+  // 随机概率
+  async GetSliceRandomProbability(slice) {
+    let probabilityList = []
+    const nonstop = await this.dealTopXX(20);
+    const allRecords = await this.GetLatest(slice * 60);
+    const allSlice = await this.dealRandomDXDSAnalizy(allRecords);
+    const all = 50;
+    const totalStatisticsNumbers = this._sliceMapping(slice);
+
+    for (const nonstopItem of nonstop) {
+      if (totalStatisticsNumbers > nonstopItem.nonstopCount) {
+        if (nonstopItem.daxiaodanshaung === '大' || nonstopItem.daxiaodanshaung === '小') {
+          if (allSlice.daResult <= all) {
+            let tp = this._comparedP(all, allSlice.daResult);
+            probabilityList.push({
+              dxds: '大',
+              p: tp
+            });
+            probabilityList.push({
+              dxds: '小',
+              p: 100 - tp
+            });
+          } else {
+            let tp = this._comparedP(all, allSlice.xiaoResult);
+            probabilityList.push({
+              dxds: '大',
+              p: 100 - tp
+            });
+            probabilityList.push({
+              dxds: '小',
+              p: tp
+            });
+          }
+        } else {
+          if (allSlice.danResult <= all) {
+            let tp = this._comparedP(all, allSlice.danResult);
+            probabilityList.push({
+              dxds: '单',
+              p: tp
+            });
+            probabilityList.push({
+              dxds: '双',
+              p: 100 - tp
+            });
+          } else {
+            let tp = this._comparedP(all, allSlice.shuangResult);
+            probabilityList.push({
+              dxds: '单',
+              p: 100 - tp
+            });
+            probabilityList.push({
+              dxds: '双',
+              p: tp
+            });
+          }
+        }
+      }
+    }
+
+    for (let item of probabilityList) {
+      item.p = parseFloat(item.p.toFixed(2));
+    }
+    logger.debug(probabilityList);
+
+    return probabilityList;
   }
 
   async _fibonacciVariance(sliceProbability) {
@@ -623,6 +731,13 @@ class EosLottery {
       r = parseFloat((r*100).toFixed(2));
       result.push(r);
     });
+    return result;
+  }
+
+  _dealRandomProbability(list, numerator) {
+    let result = (list.filter((item) => item === numerator).length / list.length);
+    result = result.toFixed(4) * 100 / 100;
+    result = parseFloat((result*100).toFixed(2));
     return result;
   }
 

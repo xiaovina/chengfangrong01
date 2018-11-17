@@ -90,8 +90,16 @@ router.get('/probability/slice', async ctx => {
   } catch (err) {
     console.log(err);
   }
+})
 
-  // ctx.body = await eosLotteryServices.GetSliceProbability(slice);
+router.get('/probability/slice/dxds', async ctx => {
+  const { slice } = ctx.request.query;
+  try {
+    let x = await eosLotteryServices.GetSliceRandomProbability(slice);
+    ctx.body = x;
+  } catch (err) {
+    console.log(err);
+  }
 })
 
 router.get('/eos/newest', async ctx => {

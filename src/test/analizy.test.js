@@ -24,11 +24,14 @@ const run = async() => {
     // const sp = await eosLottery.dealSliceProbability();
     // logger.debug(sp)
 
-    let allp1 = await eosLottery.GetAllProbability();
-    logger.debug(allp1);
+    // let allp1 = await eosLottery.GetAllProbability();
+    // logger.debug(allp1);
 
-    let allp2 = await eosLottery.GetSliceProbability(13);
+    let allp2 = await eosLottery.GetSliceProbability(2);
     logger.debug(allp2);
+
+    let allRP1 = await eosLottery.GetSliceRandomProbability(13);
+    logger.debug(allRP1);
 
 
   } catch (err) {
