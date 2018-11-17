@@ -153,6 +153,14 @@ class EosLottery {
     return result;
   }
 
+  async getNewestGameId() {
+    const sql = `
+    select gameid from LotteryRecord
+    order by id desc limit 1;
+  `;
+  return await db.selectAll(sql);
+  }
+
   async dealAnalizyAll(list) {
     const AnalizyRange = {
       da: '大',
@@ -389,107 +397,113 @@ class EosLottery {
     let probabilityList = []
     const nonstop = await this.dealTopXX(20);
     const allRecords = await this.GetLatest(slice * 60);
-    const all = await this.dealAnalizyAll(allRecords);
+    const allSlice = await this.dealAnalizyAll(allRecords);
+    const all = await this.dealAllProbability();
     const totalStatisticsNumbers = this._sliceMapping(slice);
 
     for (const nonstopItem of nonstop) {
-      if (nonstopItem.daxiaodanshaung === '大') {
+      if (totalStatisticsNumbers > nonstopItem.nonstopCount) {
+        if (nonstopItem.daxiaodanshaung === '大') {
+          let after1 = all.daResult.filter(( v, k ) => {
+            if ( k >= nonstopItem.nonstopCount ) return v;
+          }).reduce(( a, b ) =>
+            a + b
+          );
 
-        let after = all.daResult.filter(( v, k ) => {
-          if ( k >= nonstopItem.nonstopCount ) return v;
-        }).reduce(( a, b ) =>
-          a + b
-        );
-        if (after < 20) {
-          after *= 1.5;
-        }
+          let after2 = allSlice.daResult.filter(( v, k ) => {
+            if ( k >= nonstopItem.nonstopCount ) return v;
+          }).reduce(( a, b ) =>
+            a + b
+          );
+          let tp = this._comparedP(after1, after2);
 
-        let totalContinuousP = after;
-        let p = [];
-        for (let i=1; i < totalStatisticsNumbers; i++) {
-          p.push(all.xiaoResult[i])
-        }
-        let tp = totalContinuousP + this._average(p);
-        probabilityList.push({
-          dxds: '大',
-          p: tp
-        });
-        probabilityList.push({
-          dxds: '小',
-          p: 100 - tp
-        });
-      } else if (nonstopItem.daxiaodanshaung === '小') {
-        let after = all.xiaoResult.filter(( v, k ) => {
-          if ( k >= nonstopItem.nonstopCount ) return v;
-        }).reduce(( a, b ) =>
-          a + b
-        );
-        if (after < 20) {
-          after *= 1.5;
-        }
+          if (tp > 80) {
+            tp *= 0.8;
+          }
+          probabilityList.push({
+            dxds: '大',
+            p: tp
+          });
+          probabilityList.push({
+            dxds: '小',
+            p: 100 - tp
+          });
+        } else if (nonstopItem.daxiaodanshaung === '小') {
+          let after1 = all.xiaoResult.filter(( v, k ) => {
+            if ( k >= nonstopItem.nonstopCount ) return v;
+          }).reduce(( a, b ) =>
+            a + b
+          );
 
-        let totalContinuousP = after;
-        let p = [];
-        for (let i=1; i < totalStatisticsNumbers; i++) {
-          p.push(all.daResult[i])
-        }
-        let tp = totalContinuousP + this._average(p);
-        probabilityList.push({
-          dxds: '大',
-          p: 100 - tp
-        });
-        probabilityList.push({
-          dxds: '小',
-          p: tp
-        });
-      } else if (nonstopItem.daxiaodanshaung === '单') {
-        let after = all.danResult.filter(( v, k ) => {
-          if ( k >= nonstopItem.nonstopCount ) return v;
-        }).reduce(( a, b ) =>
-          a + b
-        );
-        if (after < 20) {
-          after *= 1.5;
-        }
+          let after2 = allSlice.xiaoResult.filter(( v, k ) => {
+            if ( k >= nonstopItem.nonstopCount ) return v;
+          }).reduce(( a, b ) =>
+            a + b
+          );
+          let tp = this._comparedP(after1, after2);
 
-        let totalContinuousP = after;
-        let p = [];
-        for (let i=1; i < totalStatisticsNumbers; i++) {
-          p.push(all.shuangResult[i])
-        }
-        let tp = totalContinuousP + this._average(p);
-        probabilityList.push({
-          dxds: '单',
-          p: tp
-        });
-        probabilityList.push({
-          dxds: '双',
-          p: 100 - tp
-        });
-      } else if (nonstopItem.daxiaodanshaung === '双') {
-        let after = all.shuangResult.filter(( v, k ) => {
-          if ( k >= nonstopItem.nonstopCount ) return v;
-        }).reduce(( a, b ) =>
-          a + b
-        );
-        if (after < 20) {
-          after *= 1.5;
-        }
+          if (tp > 80) {
+            tp *= 0.8;
+          }
+          probabilityList.push({
+            dxds: '大',
+            p: 100 - tp
+          });
+          probabilityList.push({
+            dxds: '小',
+            p: tp
+          });
+        } else if (nonstopItem.daxiaodanshaung === '单') {
+          let after1 = all.danResult.filter(( v, k ) => {
+            if ( k >= nonstopItem.nonstopCount ) return v;
+          }).reduce(( a, b ) =>
+            a + b
+          );
 
-        let totalContinuousP = after;
-        let p = [];
-        for (let i=1; i < totalStatisticsNumbers; i++) {
-          p.push(all.danResult[i])
+          let after2 = allSlice.danResult.filter(( v, k ) => {
+            if ( k >= nonstopItem.nonstopCount ) return v;
+          }).reduce(( a, b ) =>
+            a + b
+          );
+          let tp = this._comparedP(after1, after2);
+
+          if (tp > 80) {
+            tp *= 0.8;
+          }
+          probabilityList.push({
+            dxds: '单',
+            p: tp
+          });
+          probabilityList.push({
+            dxds: '双',
+            p: 100 - tp
+          });
+        } else if (nonstopItem.daxiaodanshaung === '双') {
+          let after1 = all.shuangResult.filter(( v, k ) => {
+            if ( k >= nonstopItem.nonstopCount ) return v;
+          }).reduce(( a, b ) =>
+            a + b
+          );
+
+          let after2 = allSlice.shuangResult.filter(( v, k ) => {
+            if ( k >= nonstopItem.nonstopCount ) return v;
+          }).reduce(( a, b ) =>
+            a + b
+          );
+          let tp = this._comparedP(after1, after2);
+
+          if (tp > 80) {
+            tp *= 0.8;
+          }
+          probabilityList.push({
+            dxds: '单',
+            p: 100 - tp
+          });
+          probabilityList.push({
+            dxds: '双',
+            p: tp
+          });
         }
-        let tp = totalContinuousP + this._average(p);
-        probabilityList.push({
-          dxds: '单',
-          p: 100 - tp
-        });
-        probabilityList.push({
-          dxds: '双',
-          p: tp
-        });
       }
     }
 
@@ -641,6 +655,14 @@ class EosLottery {
     const av = parseFloat(average.toFixed(2));
     logger.debug('av', av);
     return av;
+  }
+
+
+  _comparedP(previous, current) {
+    let cp =  Math.abs(previous - current) / previous + current;
+    cp = parseFloat(cp.toFixed(2));
+    logger.debug('cp', cp);
+    return cp;
   }
 
   _sliceMapping(slice) {

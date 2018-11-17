@@ -83,6 +83,9 @@
   <hr/>
   <div class="row">
     <div class="col-sm-2">
+      期号：<span id="newestGameId" style="color:blue;">-</span>
+    </div>
+    <div class="col-sm-2">
       目前连<span id="nonstopDaXiao" style="color: red"></span><span id="nonstopDaXiaoTimes" style="color: red"></span>次;
     </div>
     <div class="col-sm-2">
@@ -306,6 +309,7 @@ function getNonstop() {
   $("#nonstopDanShuangTimes").html('...')
 
   getAllProbability();
+  getNewestGameId();
   $.ajax({
       url: `/api/v1/lottery/analizy/nonstop`,
       method: 'get',
@@ -318,13 +322,22 @@ function getNonstop() {
         $("#nonstopDanShuang").html(res[1].daxiaodanshaung)
         $("#nonstopDanShuangTimes").html(res[1].nonstopCount)
 
-        _sleep(5000).then(() => {
+        _sleep(2000).then(() => {
           getNonstop();
         })
       }
     });
 }
 
+function getNewestGameId() {
+  $.ajax({
+      url: `/api/v1/lottery/eos/newest`,
+      method: 'get',
+    }).done(function(res) {
+      console.log(res);
+      $(`#newestGameId`).html(res[0].gameid);
+    });
+}
 function getAllProbability() {
   $.ajax({
       url: `/api/v1/lottery/probability/all`,
@@ -348,6 +361,10 @@ function doSliceAnalizy() {
     alert('请选择小时数！');
     return;
   } else {
+    var limit = _sliceMapping(optionsRadiosFirb);
+
+
+
     $("#sliceProbability").html('');
     $.ajax({
       url: `/api/v1/lottery/probability/slice?slice=${optionsRadiosFirb}`,
@@ -355,10 +372,10 @@ function doSliceAnalizy() {
     }).done(function(res) {
       console.log(res);
       if (res && res.length > 0) {
-        for (let r of res) {
-          console.log(r)
-          $("#sliceProbability").append(`<span style="color: red">${optionsRadiosFirb}</span>小时投注${r.dxds}的中奖概率<span id="sliceProbability" style="color: red">${r.p}</span>%;<br/>`);
-        }
+          for (let r of res) {
+            console.log(r);
+            $("#sliceProbability").append(`<span style="color: red">${optionsRadiosFirb}</span>小时投注${r.dxds}的中奖概率<span id="sliceProbability" style="color: red">${r.p}</span>%;<br/>`);
+          }
       }
 
     });
@@ -381,5 +398,38 @@ function dealLocalStorage(type, data = null) {
   }
 }
 
+function _sliceMapping(slice) {
+    slice = Number(slice);
+    if (slice ===2) {
+      return 2;
+    }
+    if (slice ===5) {
+      return 3;
+    }
+    if (slice ===8) {
+      return 3;
+    }
+    if (slice ===13) {
+      return 4;
+    }
+    if (slice ===21) {
+      return 4;
+    }
+    if (slice ===34) {
+      return 5;
+    }
+    if (slice ===55) {
+      return 5;
+    }
+    if (slice ===89) {
+      return 6;
+    }
+    if (slice ===144) {
+      return 8;
+    }
+    if (slice ===233) {
+      return 9;
+    }
+  }
 </script>
 </html>
