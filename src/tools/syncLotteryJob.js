@@ -12,10 +12,10 @@ const run = async() => {
     } catch (e) {
       logger.error(e)
     }
-    logger.info('finished sync job')
+    // logger.info('finished sync job')
 
     await sleep(interval)
-    logger.debug(`fetch sync job after ${interval / 1000} seconds`)
+    // logger.debug(`fetch sync job after ${interval / 1000} seconds`)
   }
 }
 

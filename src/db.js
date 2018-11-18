@@ -25,7 +25,6 @@ const loadModels = (filePath, db) => {
 }
 
 const modelsPath = path.resolve(path.join(__dirname, 'sequelize-models'))
-logger.debug("modelsPath", modelsPath)
 
 
 const db = new Sequelize(Object.assign(mysql.options, {
@@ -44,14 +43,12 @@ const selectOne = async(sql, params) => {
 }
 
 const selectAll = async(sql, params) => {
-  logger.debug("selectAll", sql, params)
   return await db.query(sql, { replacements: params, type: Sequelize.QueryTypes.SELECT })
 }
 
 
 const execute = async(sql, params) => {
   return await db.query(sql, { replacements: params }).spread((results, metadata) => {
-    logger.debug("execute", results, metadata)
     return results
   }).catch(err => {
     logger.error("execute sql error", sql, params, err)
@@ -59,8 +56,6 @@ const execute = async(sql, params) => {
 }
 
 loadModels(modelsPath, db)
-
-logger.debug("load models", models)
 
 
 module.exports = {

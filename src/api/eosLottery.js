@@ -58,8 +58,6 @@ class EosLottery {
   async GetList(start, end) {
     const dateStart = moment(start).add(-1, 'm').toDate()
     const dateEnd = moment(end).add(1, 'm').toDate()
-    logger.debug(dateStart);
-    logger.debug(dateEnd);
 
     const sql = `
     select daxiao, danshuang from LotteryRecord
@@ -107,7 +105,6 @@ class EosLottery {
     });
 
     const daxiaoNonstop = this.getNonstopCode(daxiaoList);
-    logger.info(daxiaoNonstop);
     if (daxiaoNonstop && daxiaoNonstop.length > 0) {
       let daxiaodanshaung = '';
       if (daxiaoNonstop[0][0] === 0) {
@@ -123,7 +120,6 @@ class EosLottery {
     }
 
     const danshuangNonstop = this.getNonstopCode(danshuangList);
-    logger.info(danshuangNonstop);
     if (danshuangNonstop && danshuangNonstop.length > 0) {
 
       let daxiaodanshaung = '';
@@ -190,21 +186,15 @@ class EosLottery {
     });
 
     let daxiaoStr = daxiaoList.map(o => o).join('');
-    logger.debug(daxiaoStr)
     let danshuangStr = danshuangList.map(o => o).join('');
-    logger.debug(danshuangStr)
 
     // daxiao handle
     const daResult = await this._analizyItem(daxiaoStr, '1');
-    logger.debug(daResult)
     const xiaoResult = await this._analizyItem(daxiaoStr, '0');
-    logger.debug(xiaoResult)
 
     // danshaung handle
     const danResult = await this._analizyItem(danshuangStr, '1');
-    logger.debug(danResult)
     const shuangResult = await this._analizyItem(danshuangStr, '0');
-    logger.debug(shuangResult)
 
     const result = {
       daResult: this._dealProbability(daResult),
@@ -212,7 +202,6 @@ class EosLottery {
       danResult: this._dealProbability(danResult),
       shuangResult: this._dealProbability(shuangResult),
     }
-    logger.debug(result)
 
     return result
   }
@@ -245,7 +234,6 @@ class EosLottery {
       danResult,
       shuangResult,
     }
-    logger.debug(result)
 
     return result
   }
@@ -262,7 +250,6 @@ class EosLottery {
       p = parseFloat((p*100).toFixed(2));
       result.push(p);
     }
-    logger.debug('dealRandom09Analizy result', result);
     return result
   }
 
@@ -278,11 +265,9 @@ class EosLottery {
       if (list && list.length > 0) {
         if (daxiao) {
           let daxiaoStr = list.map(o => o.daxiao).join('');
-          logger.debug(daxiaoStr);
 
           if (daxiao === AnalizyRange.da) {
             daxiaoStr = `小${daxiaoStr}小`;
-            logger.debug(daxiaoStr);
 
             for(let i = 1; i <= 15; i++) {
               const daStr = AnalizyRange.da.repeat(i);
@@ -291,7 +276,6 @@ class EosLottery {
             }
           } else if (daxiao === AnalizyRange.xiao) {
             daxiaoStr = `大${daxiaoStr}大`;
-            logger.debug(daxiaoStr);
 
             for(let i = 1; i <= 15; i++) {
               const xiaoStr = AnalizyRange.xiao.repeat(i);
@@ -301,11 +285,9 @@ class EosLottery {
           }
         } else if (danshuang) {
           let danshuangStr = list.map(o => o.danshuang).join('');
-          logger.debug(danshuangStr);
 
           if (danshuang === AnalizyRange.dan) {
             danshuangStr = `双${danshuangStr}双`;
-            logger.debug(danshuangStr);
 
             for(let i = 1; i <= 15; i++) {
               const danStr = AnalizyRange.dan.repeat(i);
@@ -314,7 +296,6 @@ class EosLottery {
             }
           } else if (danshuang === AnalizyRange.shuang) {
             danshuangStr = `单${danshuangStr}单`;
-            logger.debug(danshuangStr);
 
             for(let i = 1; i <= 15; i++) {
               const shaungStr = AnalizyRange.shuang.repeat(i);
@@ -329,7 +310,6 @@ class EosLottery {
       logger.error(err);
     }
 
-    logger.debug(result);
     return result;
   }
 
@@ -435,7 +415,6 @@ class EosLottery {
     for (let item of probabilityList) {
       item.p = parseFloat(item.p.toFixed(2));
     }
-    logger.debug(probabilityList);
 
     return probabilityList;
   }
@@ -558,7 +537,6 @@ class EosLottery {
     for (let item of probabilityList) {
       item.p = parseFloat(item.p.toFixed(2));
     }
-    logger.debug(probabilityList);
 
     return probabilityList;
   }
@@ -598,7 +576,6 @@ class EosLottery {
     for (let item of probabilityList) {
       item.p = parseFloat(item.p.toFixed(2));
     }
-    logger.debug(probabilityList);
 
     return probabilityList;
   }
@@ -609,7 +586,6 @@ class EosLottery {
     const allRecords = await this.GetLatest(slice * 60);
     const allSlice = await this.dealRandom09Analizy(allRecords);
 
-    logger.debug("allSlice", allSlice)
     const all = 20;
     for (let item of allSlice) {
       let p = all - item;
@@ -619,7 +595,6 @@ class EosLottery {
     for (let item of probabilityList) {
       item = parseFloat(item.toFixed(2));
     }
-    logger.debug(probabilityList);
 
     return probabilityList;
   }
@@ -696,7 +671,6 @@ class EosLottery {
     } else {
       str = `1${str}1`;
     }
-    logger.debug(str);
 
     for(let i = 1; i <= 15; i++) {
       let subStr = range01.repeat(i);
@@ -722,7 +696,6 @@ class EosLottery {
   _dealProbability(list) {
     const denominator = parseFloat(_.sum(list))
     let result = []
-    logger.debug(denominator)
 
     list.forEach(item => {
       let r = (item / denominator);
@@ -767,7 +740,6 @@ class EosLottery {
     data = data.reduce((previous, current) => current += previous);
     let average = data /= count;
     const av = parseFloat(average.toFixed(2));
-    logger.debug('av', av);
     return av;
   }
 
@@ -775,7 +747,6 @@ class EosLottery {
   _comparedP(previous, current) {
     let cp =  Math.abs(previous - current) / previous + current;
     cp = parseFloat(cp.toFixed(2));
-    logger.debug('cp', cp);
     return cp;
   }
 

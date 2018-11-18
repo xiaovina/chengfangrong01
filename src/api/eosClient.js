@@ -35,7 +35,7 @@ class EosClient {
       blocksBehind: 3,
       expireSeconds: 30,
     });
-    logger.info(result);
+    // logger.info(result);
     return result;
   }
 }

@@ -71,7 +71,7 @@ class EosSocketWSSClient {
 
     wsc.open('wss://eosplay.com/v3/p2p');
     wsc.onopen = function(e){
-      logger.trace("WebSocketClient connected:",e);
+      // logger.trace("WebSocketClient connected:",e);
       this.send("ping");
     }
     wsc.onmessage = function(data, flags, number){
