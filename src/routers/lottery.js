@@ -102,6 +102,17 @@ router.get('/probability/slice/dxds', async ctx => {
   }
 })
 
+router.get('/probability/slice/zerotonine', async ctx => {
+  const { slice } = ctx.request.query;
+  try {
+    let x = await eosLotteryServices.GetSlice09RandomProbability(slice);
+    ctx.body = x;
+  } catch (err) {
+    console.log(err);
+  }
+})
+
+
 router.get('/eos/newest', async ctx => {
   ctx.body = await eosLotteryServices.getNewestGameId();
 })

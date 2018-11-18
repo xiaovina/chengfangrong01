@@ -5,7 +5,7 @@ const sleep = async(ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 const run = async() => {
-  let interval = 10 * 1000
+  let interval = 5 * 1000
   while (true) {
     try {
       await eosLottery.SyncNewestLottery();

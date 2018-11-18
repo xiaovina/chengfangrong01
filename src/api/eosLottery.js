@@ -72,7 +72,7 @@ class EosLottery {
 
   async GetLatest(limit) {
     const sql = `
-      select daxiao, danshuang from LotteryRecord
+      select daxiao, danshuang, result from LotteryRecord
       order by id desc limit ${limit}
     `;
     return await db.selectAll(sql);
@@ -217,28 +217,17 @@ class EosLottery {
     return result
   }
 
-  // 随机概率统计
+  // 随机概率统计 dxds
   async dealRandomDXDSAnalizy(list) {
-    const AnalizyRange = {
-      da: '大',
-      da1: 1,
-      xiao: '小',
-      xiao0: 0,
-      dan: '单',
-      dan1: 1,
-      shuang: '双',
-      shuang0: 0
-    };
-
     let daxiaoList = [];
     let danshuangList = [];
     list.forEach(item => {
-      if(item.daxiao === AnalizyRange.da) {
+      if(item.daxiao === '大') {
         daxiaoList.push(1);
       } else {
         daxiaoList.push(0);
       }
-      if(item.danshuang === AnalizyRange.dan) {
+      if(item.danshuang === '单') {
         danshuangList.push(1);
       } else {
         danshuangList.push(0);
@@ -258,6 +247,22 @@ class EosLottery {
     }
     logger.debug(result)
 
+    return result
+  }
+
+  // 随机概率统计 0-9
+  async dealRandom09Analizy(list) {
+    let result = [];
+    for (let item of list) {
+      item.item09 = item.result % 10;
+    }
+    for (let i = 0; i <= 9; i++) {
+      let list09 = list.filter(o => o.item09 === i);
+      let p = list09.length / list.length;
+      p = parseFloat((p*100).toFixed(2));
+      result.push(p);
+    }
+    logger.debug('dealRandom09Analizy result', result);
     return result
   }
 
@@ -558,64 +563,61 @@ class EosLottery {
     return probabilityList;
   }
 
-  // 随机概率
+  // 随机概率 dxds
   async GetSliceRandomProbability(slice) {
     let probabilityList = []
-    const nonstop = await this.dealTopXX(20);
     const allRecords = await this.GetLatest(slice * 60);
     const allSlice = await this.dealRandomDXDSAnalizy(allRecords);
-    const all = 50;
+    const all = 100;
 
-    for (const nonstopItem of nonstop) {
-      if (nonstopItem.daxiaodanshaung === '大' || nonstopItem.daxiaodanshaung === '小') {
-        if (allSlice.daResult <= all) {
-          const tp = this._comparedP(all, allSlice.daResult);
-          probabilityList.push({
-            dxds: '大',
-            p: 100 - tp
-          });
-          probabilityList.push({
-            dxds: '小',
-            p: tp
-          });
-        } else {
-          let tp = this._comparedP(all, allSlice.xiaoResult);
-          probabilityList.push({
-            dxds: '大',
-            p: tp
-          });
-          probabilityList.push({
-            dxds: '小',
-            p: 100 - tp
-          });
-        }
-      } else {
-        if (allSlice.danResult <= all) {
-          let tp = this._comparedP(all, allSlice.danResult);
-          probabilityList.push({
-            dxds: '单',
-            p: 100 - tp
-          });
-          probabilityList.push({
-            dxds: '双',
-            p: tp
-          });
-        } else {
-          let tp = this._comparedP(all, allSlice.shuangResult);
-          probabilityList.push({
-            dxds: '单',
-            p: tp
-          });
-          probabilityList.push({
-            dxds: '双',
-            p: 100 - tp
-          });
-        }
+    probabilityList.push(
+      {
+        dxds: '大',
+        p: all - allSlice.daResult
       }
-    }
+    )
+    probabilityList.push(
+      {
+        dxds: '小',
+        p: all - allSlice.xiaoResult
+      }
+    )
+    probabilityList.push(
+      {
+        dxds: '单',
+        p: all - allSlice.danResult
+      }
+    )
+    probabilityList.push(
+      {
+        dxds: '双',
+        p: all - allSlice.shuangResult
+      }
+    )
 
     for (let item of probabilityList) {
       item.p = parseFloat(item.p.toFixed(2));
+    }
+    logger.debug(probabilityList);
+
+    return probabilityList;
+  }
+
+  // 随机概率 0-9
+  async GetSlice09RandomProbability(slice) {
+    let probabilityList = []
+    const allRecords = await this.GetLatest(slice * 60);
+    const allSlice = await this.dealRandom09Analizy(allRecords);
+
+    logger.debug("allSlice", allSlice)
+    const all = 20;
+    for (let item of allSlice) {
+      let p = all - item;
+      p = p.toFixed(4)*100 / 100;
+      probabilityList.push(p);
+    }
+    for (let item of probabilityList) {
+      item = parseFloat(item.toFixed(2));
     }
     logger.debug(probabilityList);
 
