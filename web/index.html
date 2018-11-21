@@ -154,10 +154,10 @@
     </div>
     <div class="row" style="font-weight: 500; margin-top: 20px;">
       <div class="col-sm-2">连续次数 \ 概率</div>
-      <div class="col-sm-2">大</div>
-      <div class="col-sm-2">小</div>
-      <div class="col-sm-2">单</div>
-      <div class="col-sm-2">双</div>
+      <div class="col-sm-2">大<span id="daSum" style="color:blue"></span></div>
+      <div class="col-sm-2">小<span id="xiaoSum" style="color:blue"></span></div>
+      <div class="col-sm-2">单<span id="danSum" style="color:blue"></span></div>
+      <div class="col-sm-2">双<span id="shuangSum" style="color:blue"></span></div>
     </div>
     <div class="analizyList" style="color:blue">
 
@@ -204,13 +204,6 @@ function doAnalizy() {
   var endTime = $("#endTime").val();
   const end = `${endDate} ${endTime}`;
 
-  // var daxiaodanshuang = $("#daxiaodanshaung").val();
-  // var url;
-  // if (daxiaodanshuang == "大" || daxiaodanshuang == "小") {
-  //   url = `/api/v1/lottery/analizy?start=${start}&end=${end}&daxiao=${daxiaodanshuang}`
-  // } else if (daxiaodanshuang == "单" || daxiaodanshuang == "双") {
-  //   url = `/api/v1/lottery/analizy?start=${start}&end=${end}&danshuang=${daxiaodanshuang}`
-  // }
   $.ajax({
       url: `/api/v1/lottery/analizy/all?start=${start}&end=${end}`
     }).done(function(res) {
@@ -218,7 +211,16 @@ function doAnalizy() {
       $("#AnalizyResult .totalGame").html(res.total);
       $("#AnalizyResult .analizyList").html('');
       if (res.total > 0 && res.analizyList) {
+        let daSum = 0;
+        let xiaoSum = 0;
+        let danSum = 0;
+        let shuangSum = 0;
         for (let i = 0; i < 20; i++) {
+
+          daSum += res.analizyList.daResult[i] * (i+1);
+          xiaoSum += res.analizyList.xiaoResult[i] * (i+1);
+          danSum += res.analizyList.danResult[i] * (i+1);
+          shuangSum += res.analizyList.shuangResult[i] * (i+1);
           $("#AnalizyResult .analizyList").append(`
           <div class=\"row\">
             <div class=\"col-sm-2\">${i+1}次</div>
@@ -229,6 +231,10 @@ function doAnalizy() {
           </div>
           `)
         }
+        $("#daSum").html(daSum);
+        $("#xiaoSum").html(xiaoSum);
+        $("#danSum").html(danSum);
+        $("#shuangSum").html(shuangSum);
       }
     });
 }
