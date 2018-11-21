@@ -67,7 +67,7 @@ router.get('/analizy/all', async ctx => {
   end = new moment(end).add(-8, 'h').toDate();
 
   const list = await eosLotteryServices.GetList(start, end);
-  result.analizyList = await eosLotteryServices.dealAnalizyAll(list);
+  result.analizyList = await eosLotteryServices.dealCountAll(list);
   if (list && list.length) {
     result.total = list.length;
   }

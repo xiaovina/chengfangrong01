@@ -168,7 +168,6 @@
 
 
 $(function(){
-  console.log('init');
   // initialize input widgets first
   $('#AnalizyForm .time').timepicker({
       'showDuration': true,
@@ -200,12 +199,10 @@ function doAnalizy() {
   var startDate = $("#startDate").val();
   var startTime = $("#startTime").val();
   const start = `${startDate} ${startTime}`;
-  console.log(start);
 
   var endDate = $("#endDate").val();
   var endTime = $("#endTime").val();
   const end = `${endDate} ${endTime}`;
-  console.log(end);
 
   // var daxiaodanshuang = $("#daxiaodanshaung").val();
   // var url;
@@ -217,20 +214,18 @@ function doAnalizy() {
   $.ajax({
       url: `/api/v1/lottery/analizy/all?start=${start}&end=${end}`
     }).done(function(res) {
-      console.log(res.total);
-      console.log(res.analizyList);
 
       $("#AnalizyResult .totalGame").html(res.total);
       $("#AnalizyResult .analizyList").html('');
       if (res.total > 0 && res.analizyList) {
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 20; i++) {
           $("#AnalizyResult .analizyList").append(`
           <div class=\"row\">
             <div class=\"col-sm-2\">${i+1}次</div>
-            <div class=\"col-sm-2\">${res.analizyList.daResult[i]}%</div>
-            <div class=\"col-sm-2\">${res.analizyList.xiaoResult[i]}%</div>
-            <div class=\"col-sm-2\">${res.analizyList.danResult[i]}%</div>
-            <div class=\"col-sm-2\">${res.analizyList.shuangResult[i]}%</div>
+            <div class=\"col-sm-2\">${res.analizyList.daResult[i]}次</div>
+            <div class=\"col-sm-2\">${res.analizyList.xiaoResult[i]}次</div>
+            <div class=\"col-sm-2\">${res.analizyList.danResult[i]}次</div>
+            <div class=\"col-sm-2\">${res.analizyList.shuangResult[i]}次</div>
           </div>
           `)
         }
@@ -240,15 +235,10 @@ function doAnalizy() {
 
 function doTransfer() {
   var privateKey = $("#privateKey").val();
-  console.log(privateKey);
   var actor = $("#actor").val();
-  console.log(actor);
   var quantity = $("#quantity").val();
-  console.log(quantity);
   var optionsRadiosDaxiao = $("input[name=optionsRadiosDaxiao]:checked").val();
-  console.log(optionsRadiosDaxiao);
   var optionsRadiosDanShuang = $("input[name=optionsRadiosDanShuang]:checked").val();
-  console.log(optionsRadiosDanShuang);
 
   var flag = true;
   if (!privateKey || privateKey.length != 51) {
@@ -314,7 +304,6 @@ function getNonstop() {
       url: `/api/v1/lottery/analizy/nonstop`,
       method: 'get',
     }).done(function(res) {
-      console.log(res);
       $("#transferResult").html('');
       if (res && res.length === 2) {
         $("#nonstopDaXiao").html(res[0].daxiaodanshaung)
@@ -334,7 +323,6 @@ function getNewestGameId() {
       url: `/api/v1/lottery/eos/newest`,
       method: 'get',
     }).done(function(res) {
-      console.log(res);
       $(`#newestGameId`).html(res[0].gameid);
     });
 }
@@ -343,10 +331,8 @@ function getAllProbability() {
       url: `/api/v1/lottery/probability/all`,
       method: 'get',
     }).done(function(res) {
-      console.log(res);
       if (res && res.length > 0) {
         for (let r in res) {
-          console.log(r)
           $(`#allProbability-${r}`).html(res[r].p);
         }
       }
@@ -355,7 +341,6 @@ function getAllProbability() {
 
 function doSliceAnalizy() {
   var optionsRadiosFirb = $("input[name=optionsRadiosFirb]:checked").val();
-  console.log(optionsRadiosFirb);
 
   if (!optionsRadiosFirb) {
     alert('请选择小时数！');
@@ -370,10 +355,8 @@ function doSliceAnalizy() {
       url: `/api/v1/lottery/probability/slice?slice=${optionsRadiosFirb}`,
       method: 'get',
     }).done(function(res) {
-      console.log(res);
       if (res && res.length > 0) {
           for (let r of res) {
-            console.log(r);
             $("#sliceProbability").append(`<span style="color: red">${optionsRadiosFirb}</span>小时投注${r.dxds}的中奖概率<span id="sliceProbability" style="color: red">${r.p}</span>%;<br/>`);
           }
       }
@@ -384,11 +367,9 @@ function doSliceAnalizy() {
 
 function dealLocalStorage(type, data = null) {
   if (type === "set") {
-    console.log(data)
     localStorage.setItem("secret", JSON.stringify(data));
   } else {
     const secret = localStorage.getItem("secret");
-    console.log(secret)
 
     if (secret) {
       return JSON.parse(secret);

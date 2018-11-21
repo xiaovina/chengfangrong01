@@ -7,7 +7,10 @@ const db = require('../db')
 const { LotteryRecord } = db.models
 
 class EosLottery {
-  constructor() {}
+  // AnalizyDayCount
+  constructor() {
+    this.AnalizyDayCount = 20;
+  }
 
   async SyncNewestLottery() {
     const lastestLottery = await this._getLastLottery();
@@ -157,8 +160,8 @@ class EosLottery {
   return await db.selectAll(sql);
   }
 
-  // 条件概率统计
-  async dealAnalizyAll(list) {
+  // 条件概率统计 数量
+  async dealCountAll(list) {
     const AnalizyRange = {
       da: '大',
       da1: 1,
@@ -197,10 +200,23 @@ class EosLottery {
     const shuangResult = await this._analizyItem(danshuangStr, '0');
 
     const result = {
-      daResult: this._dealProbability(daResult),
-      xiaoResult: this._dealProbability(xiaoResult),
-      danResult: this._dealProbability(danResult),
-      shuangResult: this._dealProbability(shuangResult),
+      daResult,
+      xiaoResult,
+      danResult,
+      shuangResult,
+    }
+
+    return result
+  }
+
+  // 条件概率统计
+  async dealAnalizyAll(list) {
+    const countR = await this.dealCountAll(list);
+    const result = {
+      daResult: this._dealProbability(countR.daResult),
+      xiaoResult: this._dealProbability(countR.xiaoResult),
+      danResult: this._dealProbability(countR.danResult),
+      shuangResult: this._dealProbability(countR.shuangResult),
     }
 
     return result
@@ -269,7 +285,7 @@ class EosLottery {
           if (daxiao === AnalizyRange.da) {
             daxiaoStr = `小${daxiaoStr}小`;
 
-            for(let i = 1; i <= 15; i++) {
+            for(let i = 1; i <= this.AnalizyDayCount; i++) {
               const daStr = AnalizyRange.da.repeat(i);
               const daSubString = `小${daStr}小`;
               result.push(this._matchTimes(daxiaoStr, daSubString));
@@ -277,7 +293,7 @@ class EosLottery {
           } else if (daxiao === AnalizyRange.xiao) {
             daxiaoStr = `大${daxiaoStr}大`;
 
-            for(let i = 1; i <= 15; i++) {
+            for(let i = 1; i <= this.AnalizyDayCount; i++) {
               const xiaoStr = AnalizyRange.xiao.repeat(i);
               const xiaoSubString = `大${xiaoStr}大`;
               result.push(this._matchTimes(daxiaoStr, xiaoSubString));
@@ -289,7 +305,7 @@ class EosLottery {
           if (danshuang === AnalizyRange.dan) {
             danshuangStr = `双${danshuangStr}双`;
 
-            for(let i = 1; i <= 15; i++) {
+            for(let i = 1; i <= this.AnalizyDayCount; i++) {
               const danStr = AnalizyRange.dan.repeat(i);
               const danSubString = `双${danStr}双`;
               result.push(this._matchTimes(danshuangStr, danSubString));
@@ -297,7 +313,7 @@ class EosLottery {
           } else if (danshuang === AnalizyRange.shuang) {
             danshuangStr = `单${danshuangStr}单`;
 
-            for(let i = 1; i <= 15; i++) {
+            for(let i = 1; i <= this.AnalizyDayCount; i++) {
               const shaungStr = AnalizyRange.shuang.repeat(i);
               const shuangSubString = `单${shaungStr}单`;
               result.push(this._matchTimes(danshuangStr, shuangSubString));
@@ -599,34 +615,6 @@ class EosLottery {
     return probabilityList;
   }
 
-  async _fibonacciVariance(sliceProbability) {
-    const result = {
-      daResult: [],
-      xiaoResult: [],
-      danResult: [],
-      shuangResult: [],
-    }
-
-    const totalArray = {
-      daArray: [],
-      xiaoArray: [],
-      danArray: [],
-      shuangArray: [],
-    }
-    let data = new Int8Array(15);
-
-    for (const sliceP of sliceProbability) {
-      for (let j of data) {
-        for (let i of data) {
-          totalArray.daArray[j].push(sliceP.p.daResult[i])
-          totalArray.xiaoArray[j].push(sliceP.p.xiaoResult[i])
-          totalArray.danArray[j].push(sliceP.p.danResult[i])
-          totalArray.shuangArray[j].push(sliceP.p.shuangResult[i])
-        }
-      }
-    }
-  }
-
   async _getTotalRecord() {
     const sql = `select count(1) as total from LotteryRecord;`
     return await db.selectOne(sql);
@@ -672,7 +660,7 @@ class EosLottery {
       str = `1${str}1`;
     }
 
-    for(let i = 1; i <= 15; i++) {
+    for(let i = 1; i <= this.AnalizyDayCount; i++) {
       let subStr = range01.repeat(i);
       if(range01 === '1') {
         subStr = `0${subStr}0`;
@@ -711,6 +699,10 @@ class EosLottery {
     result = result.toFixed(4) * 100 / 100;
     result = parseFloat((result*100).toFixed(2));
     return result;
+  }
+
+  _dealRandomCount(list, numerator) {
+    return list.filter((item) => item === numerator).length;
   }
 
   //填充截取法
