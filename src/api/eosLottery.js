@@ -7,7 +7,6 @@ const db = require('../db')
 const { LotteryRecord } = db.models
 
 class EosLottery {
-  // AnalizyDayCount
   constructor() {
     this.AnalizyDayCount = 20;
   }
@@ -16,12 +15,10 @@ class EosLottery {
     const lastestLottery = await this._getLastLottery();
     if (lastestLottery) {
       const recordTime = moment(lastestLottery.recordTime).add(1, 'm').toDate()
-      console.log(`newest recordTime:`, recordTime);
 
       let newestLottery = await this._getList(lastestLottery.gameid)
       if (newestLottery && newestLottery.rows && newestLottery.rows.length > 0) {
         newestLottery = newestLottery.rows[0]
-        console.log(`newestLottery:`, newestLottery);
 
         if (newestLottery.result != -1) {
           const result = this._resultHandel(newestLottery.result)

@@ -26,6 +26,12 @@ NODE_ENV=<env> node tools/initLottery.js <gameid>
 pm2 start pm2.config.js --only letou-sync-worker-<env> --watch
 ```
 
+#### start realTime probability work
+
+```sh
+pm2 start pm2.config.js --only real-time-probability-worker-<env> --watch
+```
+
 #### start analizy web
 
 ``` sh
