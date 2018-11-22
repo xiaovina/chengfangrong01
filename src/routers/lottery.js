@@ -1,6 +1,7 @@
 const Router = require('koa-router')
 const eosLotteryServices = require('../api/eosLottery')
 const eosClient = require('../api/eosClient')
+const realTimeService = require('../api/realTime')
 const moment = require('moment');
 
 const router = new Router({
@@ -111,6 +112,14 @@ router.get('/probability/slice/zerotonine', async ctx => {
     console.log(err);
   }
 })
+
+router.get('/analizy/charts/', async ctx => {
+  let { x, slice, start, end } = ctx.request.query;
+  start = new moment(start).add(-8, 'h').toDate();
+  end = new moment(end).add(-8, 'h').toDate();
+  ctx.body = await realTimeService.getData(x, slice, start, end);
+})
+
 
 
 router.get('/eos/newest', async ctx => {

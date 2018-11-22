@@ -23,7 +23,7 @@ NODE_ENV=<env> node tools/initLottery.js <gameid>
 #### start sync work
 
 ```sh
-pm2 start pm2.config.js --only letou-sync-worker-<env> --watch
+pm2 start pm2.config.js --only letou-sync-worke <env> --watch
 ```
 
 #### start realTime probability work
@@ -41,3 +41,7 @@ pm2 start pm2.config.js --only letou-analizy-web-<env> --watch
 ### debug
 
 just vscode DEBUG
+
+### mysql in winserver
+
+-- https://blog.csdn.net/xulianboblog/article/details/51086529
