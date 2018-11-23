@@ -12,13 +12,13 @@ const run = async() => {
   const slice = [60, 120] // min
   while (true) {
     try {
-      const oneHourDxds = await eosLotteryServices.GetSliceRandomProbability(slice[0]);
-      const twoHourDxds = await eosLotteryServices.GetSliceRandomProbability(slice[1]);
+      const oneHourDxds = await eosLotteryServices.GetSliceRandomProbability(1);
+      const twoHourDxds = await eosLotteryServices.GetSliceRandomProbability(2);
       await save(oneHourDxds, slice[0], 'dxds');
       await save(twoHourDxds, slice[1], 'dxds');
 
-      const oneHour09 = await eosLotteryServices.GetSlice09RandomProbability(slice[0]);
-      const twoHour09 = await eosLotteryServices.GetSlice09RandomProbability(slice[1]);
+      const oneHour09 = await eosLotteryServices.GetSlice09RandomProbability(1);
+      const twoHour09 = await eosLotteryServices.GetSlice09RandomProbability(2);
       await save(oneHour09, slice[0], '09');
       await save(twoHour09, slice[1], '09');
 
