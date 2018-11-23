@@ -7,12 +7,14 @@ const db = require('../db')
 class RealTime {
   constructor() { }
 
-  async getData(x, slice, start, end) {
+  async getData(x, slice, start, end, limit) {
     let result = [];
     let table;
-    const dateStart = moment(moment(start).add(-1, 'm').toDate());
-    const dateEnd = moment(moment(end).add(1, 'm').toDate());
-    let limit = dateEnd.diff(dateStart) / 60000; // millisecond to minuet
+    if (!limit || limit <= 0 ) {
+      const dateStart = moment(moment(start).add(-1, 'm').toDate());
+      const dateEnd = moment(moment(end).add(1, 'm').toDate());
+      limit = dateEnd.diff(dateStart) / 60000; // millisecond to minuet
+    }
     logger.debug('limit:', limit);
 
     if (x === "dxds") {

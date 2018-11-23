@@ -4,9 +4,10 @@
 
 <head>
 	<title>Line Chart</title>
+	<link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css" />
 	<script src="js/jquery.min.js"></script>
   <script src="bower_components/chart.js/dist/Chart.min.js"></script>
-	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+	<script src="bower_components/chart.js/samples/utils.js"></script>
 	<style>
 	canvas{
 		-moz-user-select: none;
@@ -16,24 +17,50 @@
 	</style>
 </head>
 
-<body>
-	<div style="width:75%;">
+<body class="container">
+	<div>
 		<canvas id="canvas"></canvas>
 	</div>
 
-	<div>
-		<input id="startDate" type="date" value="2018-11-01"/>
-		<input id="endDate" type="date" value="2018-11-02"/>
-		<input id="x" type="text" value="dxds"/>
-		<input id="slice" type="number" value="60"/>
+	<hr>
+
+	<div class="row">
+		<div class="form-group col-sm-3" style="margin-left:30px;">
+			<label class="radio-inline">概率区间：
+				<select id="slice">
+					<option value="60">一小时概率</option>
+					<option value="120">两小时概率</option>
+				</select>
+			</label>
+		</div>
+		<div class="form-group col-sm-3">
+			<label class="radio-inline">统计分类：
+				<select id="x">
+					<option value="dxds">大小单双</option>
+					<option value="09">0-9</option>
+				</select>
+			</label>
+		</div>
+		<div class="form-group col-sm-3">
+			<label class="radio-inline">数据量：
+				<input id="limit" type="number" value="60" placeholder="数据量"/>
+			</label>
+		</div>
+		<div class="form-group col-sm-2">
+			<label class="radio-inline">
+				<button id="getAllChartsData">查询</button>
+			</label>
+		</div>
 	</div>
+
 	<br>
-	<br>
-	<button id="randomizeData">Randomize Data</button>
-	<button id="addDataset">Add Dataset</button>
-	<button id="removeDataset">Remove Dataset</button>
-	<button id="addData">Add Data</button>
-	<button id="removeData">Remove Data</button>
+	<div style="display: none;">
+		<button id="randomizeData">Randomize Data</button>
+		<button id="addDataset">Add Dataset</button>
+		<button id="removeDataset">Remove Dataset</button>
+		<button id="addData">Add Data</button>
+		<button id="removeData">Remove Data</button>
+	</div>
 	<script>
 		var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 		var config = {
@@ -156,13 +183,14 @@
 		}
 
 		function getAllChartsData() {
-			var start = $("#startDate").val();
-			var end = $("#endDate").val();
+			// var start = $("#startDate").val();
+			// var end = $("#endDate").val();
 			var x = $("#x").val();
 			var slice = $("#slice").val();
+			var limit = $("#limit").val();
 
 			$.ajax({
-					url: `/api/v1/lottery/analizy/charts/?x=${x}&slice=${slice}&start=${start}&end=${end}`,
+					url: `/api/v1/lottery/analizy/charts/?x=${x}&slice=${slice}&limit=${limit}`,
 					method: 'get',
 				}).done(function(res) {
 					console.log(res);
@@ -176,11 +204,16 @@
 							pushCharts(item.label, item.data)
 						}
 					}
-
-
-
 				});
 		}
+
+		document.getElementById('getAllChartsData').addEventListener('click', function() {
+
+			config.data.labels =[]
+			config.data.datasets =[]
+			window.myLine.update();
+			getAllChartsData()
+		});
 
 	</script>
 </body>
