@@ -10,13 +10,6 @@ class RealTime {
   async getData(x, slice, start, end, limit) {
     let result = [];
     let table;
-    if (!limit || limit <= 0 ) {
-      const dateStart = moment(moment(start).add(-1, 'm').toDate());
-      const dateEnd = moment(moment(end).add(1, 'm').toDate());
-      limit = dateEnd.diff(dateStart) / 60000; // millisecond to minuet
-    }
-    logger.debug('limit:', limit);
-
     if (x === "dxds") {
       table = 'RealTimeDXDS';
       limit *= 4;
@@ -24,14 +17,29 @@ class RealTime {
       table = 'RealTime09';
       limit *= 10;
     }
-    const sql = `
-      select * from ${table}
-        where
-        slice = :slice
-        order by id desc
-        limit :limit;
-        `;
-    const list = await db.selectAll(sql, {slice, limit});
+
+    let list = [];
+    if (!limit || limit <= 0 ) {
+      const sql = `
+        select * from ${table}
+          where
+          slice = :slice
+          and recordTime >= :start
+          and recordTime <=:end
+          order by id desc`;
+      list = await db.selectAll(sql, {slice, start, end});
+    } else {
+      let sql = `
+        select * from ${table}
+          where
+          slice = :slice
+          order by id desc
+          limit: limit`;
+      list = await db.selectAll(sql, {slice, limit});
+    }
+
+
+
     if (x === "dxds") {
       const dxdsArray = ['大', '小', '单', '双'];
       dxdsArray.forEach(element => {
@@ -42,7 +50,16 @@ class RealTime {
         logger.debug(part);
 
         item.label = element;
-        item.data = part.map(it => it.probability);
+        item.data = part.map(it => {
+          it.x = new moment.utc(it.recordTime).local().format('YYYY-MM-DD HH:mm');
+          it.y = it.probability;
+          delete it.id
+          delete it.recordTime
+          delete it.slice
+          delete it.createdAt
+          delete it.probability
+          return it;
+        })
         result.push(item);
       });
     } else {
@@ -53,7 +70,18 @@ class RealTime {
         logger.debug(part);
 
         item.label = i;
-        item.data = part.map(it => it.probability);
+        item.data = part.map(it =>
+            {
+              it.x = new moment.utc(it.recordTime).local().format('YYYY-MM-DD HH:mm');
+              it.y = it.probability;
+              delete it.id
+              delete it.recordTime
+              delete it.slice
+              delete it.createdAt
+              delete it.probability
+              return it;
+            }
+          );
         result.push(item);
       }
     }

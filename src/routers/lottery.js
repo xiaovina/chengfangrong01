@@ -116,8 +116,8 @@ router.get('/probability/slice/zerotonine', async ctx => {
 router.get('/analizy/charts/', async ctx => {
   let { x, slice, start, end, limit } = ctx.request.query;
   if (!limit || limit <= 0) {
-    start = new moment(start).add(-8, 'h').toDate();
-    end = new moment(end).add(-8, 'h').toDate();
+    start = new moment(start).add(-8, 'h').format('YYYY-MM-DD HH:mm');
+    end = new moment(end).add(-8, 'h').format('YYYY-MM-DD HH:mm');
   }
 
   ctx.body = await realTimeService.getData(x, slice, start, end, limit);

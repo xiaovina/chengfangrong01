@@ -6,8 +6,17 @@
 	<title>Line Chart</title>
 	<link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css" />
 	<script src="js/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
   <script src="bower_components/chart.js/dist/Chart.min.js"></script>
 	<script src="bower_components/chart.js/samples/utils.js"></script>
+
+  <script src="js/jquery.timepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/jquery.timepicker.min.css" />
+  <script src="js/bootstrap-datepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.standalone.min.css" />
+  <script src="js/datepair.min.js"></script>
+	<script src="js/jquery.datepair.min.js"></script>
+
 	<style>
 	canvas{
 		-moz-user-select: none;
@@ -24,34 +33,47 @@
 
 	<hr>
 
-	<div class="row">
-		<div class="form-group col-sm-3" style="margin-left:30px;">
-			<label class="radio-inline">概率区间：
-				<select id="slice">
-					<option value="60">一小时概率</option>
-					<option value="120">两小时概率</option>
-				</select>
-			</label>
+	<form id="AnalizyForm" style="margin-left: 35px;">
+		<div class="row">
+			<div class="form-group col-sm-4">
+				<label for="end" class="col-sm-4 col-form-label">概率区间：</label>
+				<div class="row col-sm-8">
+					<select id="slice">
+						<option value="60">一小时概率</option>
+						<option value="120">两小时概率</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group col-sm-4">
+				<label for="end" class="col-sm-4 col-form-label">统计分类：</label>
+				<div class="row col-sm-8">
+					<select id="x">
+						<option value="dxds">大小单双</option>
+						<option value="09">0-9</option>
+					</select>
+				</div>
+			</div>
 		</div>
-		<div class="form-group col-sm-3">
-			<label class="radio-inline">统计分类：
-				<select id="x">
-					<option value="dxds">大小单双</option>
-					<option value="09">0-9</option>
-				</select>
-			</label>
+		<div class="row">
+			<div class="form-group col-sm-4">
+				<label for="start" class="col-sm-4 col-form-label">开始时间：</label>
+				<div class="row col-sm-8">
+					<input type="text" class="col-sm form-control date start" id="startDate" placeholder="开始日期" required>
+					<input type="text" class="col-sm form-control time start" id="startTime" placeholder="开始时间" required>
+				</div>
+			</div>
+			<div class="form-group col-sm-4">
+					<label for="end" class="col-sm-4 col-form-label">结束时间：</label>
+					<div class="row col-sm-8">
+							<input type="text" class="col-sm form-control date end" id="endDate" placeholder="开始日期" required>
+							<input type="text" class="col-sm form-control time end" id="endTime" placeholder="开始时间" required>
+					</div>
+			</div>
+			<div class="form-group col-sm-2">
+					<button type="button" class="btn btn-primary" onclick="getAllChartsData()" style="margin-top:38px;">查询</button>
+			</div>
 		</div>
-		<div class="form-group col-sm-3">
-			<label class="radio-inline">数据量：
-				<input id="limit" type="number" value="60" placeholder="数据量"/>
-			</label>
-		</div>
-		<div class="form-group col-sm-2">
-			<label class="radio-inline">
-				<button id="getAllChartsData">查询</button>
-			</label>
-		</div>
-	</div>
+	</form>
 
 	<br>
 	<div style="display: none;">
@@ -66,7 +88,7 @@
 		var config = {
 			type: 'line',
 			data: {
-				labels: [],
+				// labels: [],
 				datasets: []
 			},
 			options: {
@@ -85,10 +107,17 @@
 				},
 				scales: {
 					xAxes: [{
+						type: 'time',
 						display: true,
 						scaleLabel: {
 							display: true,
-							labelString: '分时'
+							labelString: '时间'
+						},
+						ticks: {
+							major: {
+								fontStyle: 'bold',
+								fontColor: '#FF0000'
+							}
 						}
 					}],
 					yAxes: [{
@@ -102,12 +131,28 @@
 			}
 		};
 
-		window.onload = function() {
+
+		$(function(){
+			// initialize input widgets first
+			$('#AnalizyForm .time').timepicker({
+					'showDuration': true,
+					'timeFormat': 'H:i'
+			});
+
+			$('#AnalizyForm .date').datepicker({
+					'format': 'm/d/yyyy',
+					'autoclose': true
+			});
+
+			// initialize datepair
+			var basicExampleEl = document.getElementById('AnalizyForm');
+			var datepair = new Datepair(basicExampleEl);
+
 			var ctx = document.getElementById('canvas').getContext('2d');
 			window.myLine = new Chart(ctx, config);
 
 			getAllChartsData();
-		};
+		})
 
 		document.getElementById('randomizeData').addEventListener('click', function() {
 			config.data.datasets.forEach(function(dataset) {
@@ -183,37 +228,37 @@
 		}
 
 		function getAllChartsData() {
-			// var start = $("#startDate").val();
-			// var end = $("#endDate").val();
+			// reset
+			config.data.datasets =[]
+			window.myLine.update();
+
+			// query
+			var startDate = $("#startDate").val();
+			var startTime = $("#startTime").val();
+			const start = `${startDate} ${startTime}`;
+
+			var endDate = $("#endDate").val();
+			var endTime = $("#endTime").val();
+			const end = `${endDate} ${endTime}`;
+
 			var x = $("#x").val();
 			var slice = $("#slice").val();
-			var limit = $("#limit").val();
+			// var limit = $("#limit").val();
 
 			$.ajax({
-					url: `/api/v1/lottery/analizy/charts/?x=${x}&slice=${slice}&limit=${limit}`,
+					// url: `/api/v1/lottery/analizy/charts/?x=${x}&slice=${slice}&limit=${limit}`,
+					url: `/api/v1/lottery/analizy/charts/?x=${x}&slice=${slice}&start=${start}&end=${end}`,
 					method: 'get',
 				}).done(function(res) {
 					console.log(res);
 					if (res && res.length > 0) {
 						const lablesLength = res[0].data.length;
-						config.data.labels = []
-						for (let i = 1; i <= lablesLength; i++) {
-							config.data.labels.push(i);
-						}
 						for (let item of res) {
 							pushCharts(item.label, item.data)
 						}
 					}
 				});
 		}
-
-		document.getElementById('getAllChartsData').addEventListener('click', function() {
-
-			config.data.labels =[]
-			config.data.datasets =[]
-			window.myLine.update();
-			getAllChartsData()
-		});
 
 	</script>
 </body>
