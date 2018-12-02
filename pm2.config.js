@@ -36,6 +36,30 @@ module.exports = {
         NODE_APP_INSTANCE: '',
         NODE_ENV: it
       }
+    })),
+    ...envs.map(it => ({
+      name: 'letou-auto-betting-job-' + it,
+      instances: 1,
+      script: 'src/tools/bettingJob.js',
+      args: [],
+      cwd: './',
+      exec_mode: 'cluster_mode',
+      env: {
+        NODE_APP_INSTANCE: '',
+        NODE_ENV: it
+      }
+    })),
+    ...envs.map(it => ({
+      name: 'letou-auto-betting-log-' + it,
+      instances: 1,
+      script: 'src/tools/bettingLog.js',
+      args: [],
+      cwd: './',
+      exec_mode: 'cluster_mode',
+      env: {
+        NODE_APP_INSTANCE: '',
+        NODE_ENV: it
+      }
     }))
   ]
 }

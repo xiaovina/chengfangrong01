@@ -68,10 +68,10 @@ class EosLottery {
     return await db.selectAll(sql, {dateStart, dateEnd});
   }
 
-  async GetLatest(limit) {
+  async GetLatest(limit, offset = 0) {
     const sql = `
       select daxiao, danshuang, result from LotteryRecord
-      order by id desc limit ${limit}
+      order by id desc limit ${limit} OFFSET ${offset}
     `;
     return await db.selectAll(sql);
   }
@@ -555,9 +555,15 @@ class EosLottery {
   }
 
   // 随机概率 dxds
-  async GetSliceRandomProbability(slice) {
+  async GetSliceRandomProbability(slice, isBefore = false) {
     let probabilityList = []
-    const allRecords = await this.GetLatest(slice * 60);
+
+    let allRecords = [];
+    if (isBefore) {
+      allRecords = await this.GetLatest(slice * 60, slice * 60);
+    } else {
+      allRecords = await this.GetLatest(slice * 60);
+    }
     const allSlice = await this.dealRandomDXDSAnalizy(allRecords);
     const all = 100;
 

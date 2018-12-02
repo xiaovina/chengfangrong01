@@ -36,7 +36,7 @@ router.post('/eos/transfer', async ctx => {
       result = await eosClient.transfer(privateKey, actor, amount, daxiaodanshuang).catch(err=>{
           console.log("transfer error: ",err)
           ctx.body = err
-        });;
+        });
     } catch (ex) {
       ctx.body = ex
     }

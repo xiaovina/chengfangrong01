@@ -13,6 +13,16 @@
       "restart": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Betting Job",
+      "runtimeExecutable": "nodemon",
+      "program": "${workspaceFolder}/src/tools/bettingLog.js",
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }

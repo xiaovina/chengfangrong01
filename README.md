@@ -38,6 +38,18 @@ pm2 start pm2.config.js --only real-time-probability-worker-<env> --watch
 pm2 start pm2.config.js --only letou-analizy-web-<env> --watch
 ```
 
+#### start betting job
+
+``` sh
+pm2 start pm2.config.js --only letou-auto-betting-job-<env> --watch
+```
+
+#### start betting log
+
+``` sh
+pm2 start pm2.config.js --only letou-auto-betting-log-<env> --watch
+```
+
 ### debug
 
 just vscode DEBUG

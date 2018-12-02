@@ -34,7 +34,7 @@ const db = new Sequelize(Object.assign(mysql.options, {
   password: mysql.password,
   database: mysql.database,
   logging: sql => {
-    // logger.trace("sql", sql)
+    logger.trace("sql", sql)
   }
 }))
 
@@ -45,7 +45,6 @@ const selectOne = async(sql, params) => {
 const selectAll = async(sql, params) => {
   return await db.query(sql, { replacements: params, type: Sequelize.QueryTypes.SELECT })
 }
-
 
 const execute = async(sql, params) => {
   return await db.query(sql, { replacements: params }).spread((results, metadata) => {

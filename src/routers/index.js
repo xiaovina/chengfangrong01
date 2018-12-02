@@ -7,6 +7,7 @@ const logger = require('../logger');
 
 let routerList = [
   require('./lottery'),
+  require('./betting'),
 ]
 
 logger.info("======================routers=============================")
