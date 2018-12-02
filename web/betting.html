@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>EOS Analizy tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css" />
+  <script src="js/jquery.min.js"></script>
+</head>
+<body >
+  <div class="container">
+    <h2>EOS Analizy tool (自动下单)</h2>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">一小时概率</th>
+            <th scope="col">前一小时概率</th>
+            <th scope="col">投注次数</th>
+            <th scope="col">总盈利次数</th>
+            <th scope="col">投注金额</th>
+            <th scope="col">投注备注</th>
+            <th scope="col">投注类型</th>
+            <th scope="col">投注状态</th>
+            <th scope="col">操作</th>
+          </tr>
+        </thead>
+        <tbody id="configList">
+          <tr>
+            <th scope="row">item.id</th>
+            <td>item.oneHour</th>
+            <td>item.beforeOneHour</td>
+            <td>item.bettingTimes</td>
+            <td>item.maxWinTimes</td>
+            <td>item.amount</td>
+            <td>item.item</td>
+            <td>item.isReal</td>
+            <td>item.status</td>
+            <td><a href="#" onclick="changeStatus(item.id, 0)" >开始</a> | <a href="#" onclick="changeStatus(item.id, 2)" >停止</a></td>
+          </tr>
+        </tbody>
+      </table>
+    <hr />
+    <fieldset>
+      <div id="legend" class="">
+        <legend class="">添加规则：<span style="color: crimson" id="createResult"></span></legend>
+      </div>
+      <div class="control-group">
+        <!-- Text input-->
+        <label class="control-label" for="oneHour">一小时概率：</label>
+        <div class="controls">
+          <input type="number" placeholder="66.66" class="input-xlarge" name="oneHour" id="oneHour">
+          <p class="help-block"></p>
+        </div>
+      </div>
+      <div class="control-group">
+        <!-- Text input-->
+        <label class="control-label" for="beforeOneHour">前一小时概率：</label>
+        <div class="controls">
+          <input type="number" placeholder="66.66" class="input-xlarge" name="beforeOneHour" id="beforeOneHour">
+          <p class="help-block"></p>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <!-- Text input-->
+        <label class="control-label" for="bettingTimes">投注次数：</label>
+        <div class="controls">
+          <input type="number" placeholder="120" class="input-xlarge" name="bettingTimes" id="bettingTimes">
+          <p class="help-block"></p>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <!-- Text input-->
+        <label class="control-label" for="maxWinTimes">总盈利次数：</label>
+        <div class="controls">
+          <input type="number" placeholder="7" class="input-xlarge" name="maxWinTimes" id="maxWinTimes">
+          <p class="help-block"></p>
+        </div>
+      </div>
+      <div class="control-group">
+        <!-- Text input-->
+        <label class="control-label" for="amount">投注金额：</label>
+        <div class="controls">
+          <input type="number" placeholder="1" class="input-xlarge" name="amount" id="amount">
+          <p class="help-block"></p>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <!-- Text input-->
+        <label class="control-label" for="username">投注账号：</label>
+        <div class="controls">
+          <input type="text" placeholder="" class="input-xlarge" name="username" id="username">
+          <p class="help-block">12位</p>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <!-- Text input-->
+        <label class="control-label" for="privateKey">投注私钥：</label>
+        <div class="controls">
+          <input type="text" placeholder="" class="input-xlarge" name="privateKey" id="privateKey">
+          <p class="help-block">51位</p>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <!-- Select Basic -->
+        <label class="control-label" for="item">投注备注：</label>
+        <div class="controls">
+          <select class="input-xlarge" id="item" name="item">
+            <option value="大">大</option>
+            <option value="小">小</option>
+            <option value="单">单</option>
+            <option value="双">双</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">投注类型：</label>
+        <div class="controls">
+          <!-- Multiple Radios -->
+          <label class="radio">
+            <input type="radio" value="真实投注" name="" disabled>
+            真实投注
+          </label>
+          <label class="radio">
+            <input type="radio" value="虚拟投注" name="" disabled checked="checked">
+            虚拟投注
+          </label>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label"></label>
+        <!-- Button -->
+        <div class="controls">
+          <button class="btn btn-primary" onclick="createConfig()">提交</button>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+</body>
+<script>
+
+
+$(function(){
+  console.log('init');
+  getConfig();
+})
+
+function _sleep(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+function doTransfer() {
+  var privateKey = $("#privateKey").val();
+  console.log(privateKey);
+  var actor = $("#actor").val();
+  console.log(actor);
+  var quantity = $("#quantity").val();
+  console.log(quantity);
+  var optionsRadiosDaxiao = $("input[name=optionsRadiosDaxiao]:checked").val();
+  console.log(optionsRadiosDaxiao);
+  var optionsRadiosDanShuang = $("input[name=optionsRadiosDanShuang]:checked").val();
+  console.log(optionsRadiosDanShuang);
+
+  var flag = true;
+  if (!privateKey || privateKey.length != 51) {
+    flag = false;
+  }
+  if (!actor || actor.length != 12) {
+    flag = false;
+  }
+  if (!quantity || quantity < 0.0001 || quantity > 100) {
+    flag = false;
+  }
+  if(!optionsRadiosDaxiao && !optionsRadiosDanShuang) {
+    flag = false;
+  }
+
+  let data = {
+    privateKey,
+    actor,
+    quantity
+  }
+  if (flag) {
+    dealLocalStorage("set", data);
+    $("#transferResult").html('投注中...');
+    if (optionsRadiosDaxiao) {
+      data.daxiaodanshuang = optionsRadiosDaxiao
+      postTransfer(data);
+    }
+
+    if (optionsRadiosDanShuang) {
+      data.daxiaodanshuang = optionsRadiosDanShuang
+      postTransfer(data);
+    }
+  } else {
+    $("#transferResult").html('请检查投注参数是否正确填写！');
+  }
+}
+
+function getConfig() {
+  $.ajax({
+    url: `/api/v1/betting/config`,
+    method: 'get',
+  }).done(function(res) {
+    console.log(res);
+    if (res && res.length > 0) {
+      let tbody = "";
+      for (const item of res) {
+        tbody += "<tr>";
+          tbody += "<th scope=\"row\">" + item.id + "</th>";
+          tbody += "<td>" + item.oneHour + "%</th>";
+          tbody += "<td>" + item.beforeOneHour + "%</td>";
+          tbody += "<td>" + item.bettingTimes + "</td>";
+          tbody += "<td>" + item.maxWinTimes + "</td>";
+          tbody += "<td>" + item.amount + "</td>";
+          tbody += "<td>" + item.item + "</td>";
+          tbody += "<td>" + item.isReal + "</td>";
+          tbody += "<td>" + item.status + "</td>";
+          tbody += "<td><a href=\"#\" onclick=\"changeStatus(" + item.id + ", 0)\" >开始</a> | <a href=\"#\" onclick=\"changeStatus(" + item.id + ", 2)\" >停止</a></td>";
+        tbody += "</tr>";
+      }
+      $("#configList").html(tbody);
+    }
+  });
+}
+
+function changeStatus(id, status) {
+  $.ajax({
+    url: `/api/v1/betting/config/status/`,
+    data: {
+      id, status
+    },
+    method: 'post',
+  }).done(function(res) {
+    getConfig();
+  });
+}
+
+function createConfig() {
+  const oneHour = $("#oneHour").val();
+  const beforeOneHour = $("#beforeOneHour").val();
+  const bettingTimes = $("#bettingTimes").val();
+  const maxWinTimes = $("#maxWinTimes").val();
+  const amount = $("#amount").val();
+  const item = $("#item").val();
+  const isReal = false;
+  const username = $("#username").val();
+  const privateKey = $("#privateKey").val();
+
+  const data = {
+    isReal,
+    username,
+    privateKey,
+    configEx: {
+      oneHour,
+      beforeOneHour,
+      bettingTimes,
+      maxWinTimes,
+      amount,
+      item
+    }
+  }
+  $.ajax({
+    url: `/api/v1/betting/config/new/`,
+    data,
+    method: 'post',
+  }).done(function(res) {
+    $("#createResult").html(res);
+    getConfig();
+  });
+}
+</script>
+</html>

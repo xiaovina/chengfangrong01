@@ -30,7 +30,6 @@ const run = async() => {
   }
 }
 
-// 根据配置决定启用哪个job
 const dealLogJob = async(latest, config) => {
   const configEx = JSON.parse(config.config);
   const isWin = (configEx.item === latest.daxiao) || (configEx.item === latest.danshuang);

@@ -10,6 +10,7 @@ class BettingService {
   constructor() {}
 
   /// ********************** config start **********************
+  // status 0-new 1-ing 2-stop
 
   async getConfigById(id) {
     return await BettingConfig.getById(id);
@@ -65,7 +66,7 @@ class BettingService {
   async createConfig(config) {
     // result 0-lose 1-win
     config.config = JSON.stringify(config.configEx);
-    config.status = 0; // new
+    config.status = 2; // pause
     config.frequencyId = this._configFrequencyIdGen();
     return await BettingConfig.create(config);
   }

@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const bettingService = require('../api/bettingService');
-const moment = require('moment');
 
 const router = new Router({
   prefix: '/betting'
@@ -8,8 +7,8 @@ const router = new Router({
 
 
 router.post('/config/new/', async ctx => {
-  let result = {};
   const config = ctx.request.body;
+  ctx.body = "";
 
   let flag = true;
   if (config.isReal && config.isReal === true) {
@@ -23,50 +22,50 @@ router.post('/config/new/', async ctx => {
     }
   } else {
     config.isReal = false;
+    config.username = 'test-username';
+    config.privateKey = 'test-privateKey';
   }
   if (!config.configEx) {
     flag = false
     ctx.body = "投注规则 is required";
   }
 
-  if (!config.configEx.oneHour) {
+  if (!config.configEx.oneHour || config.configEx.oneHour <= 0) {
     flag = false
-    ctx.body = "oneHour is required";
+    ctx.body = "一小时概率 is required";
   }
-  if (!config.configEx.beforeOneHour) {
+  if (!config.configEx.beforeOneHour || config.configEx.beforeOneHour <= 0) {
     flag = false
-    ctx.body = "beforeOneHour is required";
+    ctx.body = "前一小时概率 is required";
   }
-  if (!config.configEx.bettingTimes) {
+  if (!config.configEx.bettingTimes || config.configEx.bettingTimes <= 0) {
     flag = false
-    ctx.body = "bettingTimes is required";
+    ctx.body = "投注次数 is required";
   }
-  if (!config.configEx.maxWinTimes) {
+  if (!config.configEx.maxWinTimes || config.configEx.maxWinTimes <= 0) {
     flag = false
-    ctx.body = "maxWinTimes is required";
+    ctx.body = "总盈利次数 is required";
   }
-  if (!config.configEx.amount) {
+  if (!config.configEx.amount || config.configEx.amount <= 0) {
     flag = false
-    ctx.body = "amount is required";
+    ctx.body = "投注金额 is required";
   } else if (config.configEx.amount < 0.0001) {
     flag = false
     ctx.body = "金额 须大于0.0001";
   }
   if (!config.configEx.item) {
     flag = false
-    ctx.body = "投注类型 is required";
+    ctx.body = "+投注类型 is required";
   }
 
   if (flag) {
+    let result = "";
     try {
       config.configEx.amount = Number(config.configEx.amount).toFixed(4);
-      result = await bettingService.createConfig(config)
-      .catch( err=> {
-          console.log("createConfig error: ",err)
-          ctx.body = err
-        });
+      result = await bettingService.createConfig(config);
+      result = "添加成功"
     } catch (ex) {
-      ctx.body = ex
+      result = `添加失败, ${ex}`;
     }
     // todo handel result
     ctx.body = result
@@ -83,7 +82,40 @@ router.post('/config/status/', async ctx => {
 });
 
 router.get('/config', async ctx => {
-  ctx.body = await bettingService.getConfigList();
+  let resultList = [];
+  const list = await bettingService.getConfigList();
+  if (list && list.length > 0) {
+    for (const item of list) {
+      const configEx = JSON.parse(item.config);
+      resultItem = {
+        id: item.id,
+        oneHour: configEx.oneHour,
+        beforeOneHour: configEx.beforeOneHour,
+        bettingTimes: configEx.bettingTimes,
+        maxWinTimes: configEx.maxWinTimes,
+        item: configEx.item,
+        amount: configEx.amount,
+        status: statusDesc(item.status),
+        frequencyId: item.frequencyId,
+        username: item.username,
+        privateKey: item.privateKey,
+        isReal: item.isReal ? '真实' : '虚拟'
+      }
+      resultList.push(resultItem);
+    }
+  }
+  ctx.body = resultList;
 });
+
+const statusDesc = (status) => {
+  switch (status) {
+    case 0:
+      return '开始中...';
+    case 1:
+      return '执行中...';
+    case 2:
+      return '暂停';
+  }
+}
 
 module.exports = router
