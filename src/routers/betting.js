@@ -8,10 +8,10 @@ const router = new Router({
 
 router.post('/config/new/', async ctx => {
   const config = ctx.request.body;
-  ctx.body = "";
 
   let flag = true;
-  if (config.isReal && config.isReal === true) {
+  if (config.isReal && config.isReal === 'true') {
+    config.isReal = true;
     if (!config.privateKey || config.privateKey.length < 51) {
       flag = false
       ctx.body = "私钥 is required";

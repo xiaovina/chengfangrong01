@@ -1,5 +1,6 @@
 const bettingService = require('../api/bettingService');
 const eosService = require('../api/eosLottery');
+const eosClient = require('../api/eosClient');
 const logger = require('../logger');
 
 const sleep = async(ms) => {
@@ -14,6 +15,11 @@ const run = async() => {
         if (configs && configs.length > 0) {
         const latest = await eosService.GetLatest(1);
         for (let config of configs) {
+          logger.info("config", config);
+          if (config.isReal) {
+            logger.info("isReal", config.isReal);
+            dealBetting(config);
+          }
           dealLogJob(latest[0], config);
         }
       } else {
@@ -28,6 +34,11 @@ const run = async() => {
     await sleep(interval)
     logger.debug(`auto betting log jobs after ${interval / 1000} seconds`)
   }
+}
+
+const dealBetting = async(config) => {
+  const configEx = JSON.parse(config.config);
+  await eosClient.transfer(configEx.privateKey, configEx.username, configEx.amount, configEx.item);
 }
 
 const dealLogJob = async(latest, config) => {

@@ -85,9 +85,22 @@ class BettingService {
   }
 
   async getWinCountByFrequencyId(frequencyId) {
+    const win = await this._getWinCount(frequencyId);
+    const lose = await this._getLostCount(frequencyId);
+    return win.total - lose.total;
+  }
+
+  async _getWinCount(frequencyId) {
     const sql = `
     select count(*) total from bettinglog
     where frequencyId=:frequencyId and isWin = 1;
+    `;
+    return await db.selectOne(sql, { frequencyId });
+  }
+  async _getLostCount(frequencyId) {
+    const sql = `
+    select count(*) total from bettinglog
+    where frequencyId=:frequencyId and isWin = 0;
     `;
     return await db.selectOne(sql, { frequencyId });
   }

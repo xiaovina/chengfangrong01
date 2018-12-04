@@ -5,9 +5,9 @@ const sleep = async(ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 const run = async() => {
-  let interval = 1 * 1000
-  const defaultInterval = 10 * 1000
-  const maxInterval = 10 * 1000
+  let interval = 30 * 1000
+  const defaultInterval = 30 * 1000
+  const maxInterval = 90 * 1000
 
   while (true) {
     try {
@@ -19,7 +19,7 @@ const run = async() => {
           await dealJob(config);
         }
       } else {
-        logger.info('no pending job')
+        logger.info('no pending job');
         interval = interval * 2
         if (interval > maxInterval) {
           interval = maxInterval
@@ -54,7 +54,6 @@ const dealJob = async(config) => {
 }
 
 const dealNewJob = async(config) => {
-
   const start = await bettingService.checkStart(config);
   if (start) {
     await bettingService.updateConfigStatus(config.id, 1);

@@ -124,11 +124,11 @@
         <div class="controls">
           <!-- Multiple Radios -->
           <label class="radio">
-            <input type="radio" value="真实投注" name="" disabled>
+            <input type="radio" value="true" name="isReal">
             真实投注
           </label>
           <label class="radio">
-            <input type="radio" value="虚拟投注" name="" disabled checked="checked">
+            <input type="radio" value="false" name="isReal" checked="checked">
             虚拟投注
           </label>
         </div>
@@ -155,54 +155,6 @@ $(function(){
 
 function _sleep(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
-function doTransfer() {
-  var privateKey = $("#privateKey").val();
-  console.log(privateKey);
-  var actor = $("#actor").val();
-  console.log(actor);
-  var quantity = $("#quantity").val();
-  console.log(quantity);
-  var optionsRadiosDaxiao = $("input[name=optionsRadiosDaxiao]:checked").val();
-  console.log(optionsRadiosDaxiao);
-  var optionsRadiosDanShuang = $("input[name=optionsRadiosDanShuang]:checked").val();
-  console.log(optionsRadiosDanShuang);
-
-  var flag = true;
-  if (!privateKey || privateKey.length != 51) {
-    flag = false;
-  }
-  if (!actor || actor.length != 12) {
-    flag = false;
-  }
-  if (!quantity || quantity < 0.0001 || quantity > 100) {
-    flag = false;
-  }
-  if(!optionsRadiosDaxiao && !optionsRadiosDanShuang) {
-    flag = false;
-  }
-
-  let data = {
-    privateKey,
-    actor,
-    quantity
-  }
-  if (flag) {
-    dealLocalStorage("set", data);
-    $("#transferResult").html('投注中...');
-    if (optionsRadiosDaxiao) {
-      data.daxiaodanshuang = optionsRadiosDaxiao
-      postTransfer(data);
-    }
-
-    if (optionsRadiosDanShuang) {
-      data.daxiaodanshuang = optionsRadiosDanShuang
-      postTransfer(data);
-    }
-  } else {
-    $("#transferResult").html('请检查投注参数是否正确填写！');
-  }
 }
 
 function getConfig() {
@@ -251,7 +203,7 @@ function createConfig() {
   const maxWinTimes = $("#maxWinTimes").val();
   const amount = $("#amount").val();
   const item = $("#item").val();
-  const isReal = false;
+  const isReal = $("input[name=isReal]:checked").val();
   const username = $("#username").val();
   const privateKey = $("#privateKey").val();
 
