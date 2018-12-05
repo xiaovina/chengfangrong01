@@ -86,6 +86,15 @@ router.post('/config/status/', async ctx => {
   }
 });
 
+router.post('/config/delete/', async ctx => {
+  const {id} = ctx.request.body;
+  try {
+    ctx.body = await bettingService.deleteConfig(id);
+  } catch (err) {
+    ctx.body = err;
+  }
+});
+
 router.get('/config', async ctx => {
   let resultList = [];
   const list = await bettingService.getConfigList();

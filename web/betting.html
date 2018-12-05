@@ -27,18 +27,6 @@
           </tr>
         </thead>
         <tbody id="configList">
-          <tr>
-            <th scope="row">item.id</th>
-            <td>item.oneHour</th>
-            <td>item.beforeOneHour</td>
-            <td>item.bettingTimes</td>
-            <td>item.maxWinTimes</td>
-            <td>item.amount</td>
-            <td>item.item</td>
-            <td>item.isReal</td>
-            <td>item.status</td>
-            <td><a href="#" onclick="changeStatus(item.id, 0)" >开始</a> | <a href="#" onclick="changeStatus(item.id, 2)" >停止</a></td>
-          </tr>
         </tbody>
       </table>
     <hr />
@@ -196,7 +184,7 @@ function getConfig() {
           tbody += "<td>" + item.item + "</td>";
           tbody += "<td>" + item.isReal + "</td>";
           tbody += "<td>" + item.status + "</td>";
-          tbody += "<td><a href=\"#\" onclick=\"changeStatus(" + item.id + ", 0)\" >开始</a> | <a href=\"#\" onclick=\"changeStatus(" + item.id + ", 2)\" >停止</a></td>";
+          tbody += "<td><a href=\"#\" onclick=\"changeStatus(" + item.id + ", 0)\" >开始</a> | <a href=\"#\" onclick=\"changeStatus(" + item.id + ", 2)\" >停止</a> <a href=\"#\" onclick=\"deleteConfig(" + item.id + ")\" >删除</a></td>";
         tbody += "</tr>";
       }
       $("#configList").html(tbody);
@@ -209,6 +197,18 @@ function changeStatus(id, status) {
     url: `/api/v1/betting/config/status/`,
     data: {
       id, status
+    },
+    method: 'post',
+  }).done(function(res) {
+    getConfig();
+  });
+}
+
+function deleteConfig(id) {
+  $.ajax({
+    url: `/api/v1/betting/config/delete/`,
+    data: {
+      id
     },
     method: 'post',
   }).done(function(res) {

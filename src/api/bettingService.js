@@ -16,6 +16,14 @@ class BettingService {
     return await BettingConfig.getById(id);
   }
 
+  async deleteConfig(id) {
+    const sql = `
+    delete from BettingConfig
+    where id=${id};
+    `;
+    return await db.execute(sql);
+  }
+
   async getConfigList() {
     return await BettingConfig.findAll();
   }
