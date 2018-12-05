@@ -19,7 +19,8 @@
             <th scope="col">投注次数</th>
             <th scope="col">总盈利次数</th>
             <th scope="col">投注金额</th>
-            <th scope="col">投注备注</th>
+            <th scope="col">投注备注1</th>
+            <th scope="col">投注备注2</th>
             <th scope="col">投注类型</th>
             <th scope="col">投注状态</th>
             <th scope="col">操作</th>
@@ -108,14 +109,32 @@
 
       <div class="control-group">
         <!-- Select Basic -->
-        <label class="control-label" for="item">投注备注：</label>
+        <label class="control-label" for="item">投注备注1：</label>
         <div class="controls">
           <select class="input-xlarge" id="item" name="item">
             <option value="大">大</option>
             <option value="小">小</option>
             <option value="单">单</option>
             <option value="双">双</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
           </select>
+        </div>
+      </div>
+      <div class="control-group">
+        <!-- Select Basic -->
+        <label class="control-label" for="memo">投注备注2：</label>
+        <div class="controls">
+          <input type="text" placeholder="" class="input-xlarge" name="memo" id="memo">
+          <p class="help-block">例如：lotter:b</p>
         </div>
       </div>
 
@@ -173,6 +192,7 @@ function getConfig() {
           tbody += "<td>" + item.bettingTimes + "</td>";
           tbody += "<td>" + item.maxWinTimes + "</td>";
           tbody += "<td>" + item.amount + "</td>";
+          tbody += "<td>" + item.memo + "</td>";
           tbody += "<td>" + item.item + "</td>";
           tbody += "<td>" + item.isReal + "</td>";
           tbody += "<td>" + item.status + "</td>";
@@ -203,6 +223,7 @@ function createConfig() {
   const maxWinTimes = $("#maxWinTimes").val();
   const amount = $("#amount").val();
   const item = $("#item").val();
+  const memo = $("#memo").val();
   const isReal = $("input[name=isReal]:checked").val();
   const username = $("#username").val();
   const privateKey = $("#privateKey").val();
@@ -217,7 +238,8 @@ function createConfig() {
       bettingTimes,
       maxWinTimes,
       amount,
-      item
+      item,
+      memo,
     }
   }
   $.ajax({

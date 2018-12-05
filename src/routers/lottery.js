@@ -32,7 +32,7 @@ router.post('/eos/transfer', async ctx => {
 
   if (flag) {
     try {
-      let amount = Number(quantity).toFixed(4);
+      const amount = Number(quantity).toFixed(4);
       result = await eosClient.transfer(privateKey, actor, amount, daxiaodanshuang).catch(err=>{
           console.log("transfer error: ",err)
           ctx.body = err

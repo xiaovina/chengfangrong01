@@ -127,7 +127,7 @@ class BettingService {
 
       if (!stop) {
         const bettingTimes = await this.getLogCountByFrequencyId(config.frequencyId);
-        stop = bettingTimes >= configEx.bettingTimes;
+        stop = bettingTimes.total >= configEx.bettingTimes;
       }
     }
     return stop;
@@ -137,13 +137,25 @@ class BettingService {
     let start = false;
     if (config && config.config) {
       const configEx = JSON.parse(config.config);
+      const dxdsArray = ['大', '小', '单', '双'];
+      const one2NineArray = ['0','1','2','3','4','5','6','7','8','9'];
 
-      const one = await eosLotter.GetSliceRandomProbability(1);
-      const oneHourP = one.filter(it => it.dxds === configEx.item)[0].p;
-      if (oneHourP >= configEx.oneHour) {
-        const beforeOne = await eosLotter.GetSliceRandomProbability(1, true);
-        const beforeOneHourP = beforeOne.filter(it => it.dxds === configEx.item)[0].p;
-        start = beforeOneHourP >= configEx.beforeOneHour;
+      if (dxdsArray.includes(configEx.item)) {
+        const one = await eosLotter.GetSliceRandomProbability(1);
+        const oneHourP = one.filter(it => it.dxds === configEx.item)[0].p;
+        if (oneHourP >= configEx.oneHour) {
+          const beforeOne = await eosLotter.GetSliceRandomProbability(1, true);
+          const beforeOneHourP = beforeOne.filter(it => it.dxds === configEx.item)[0].p;
+          start = beforeOneHourP >= configEx.beforeOneHour;
+        }
+      } else if (one2NineArray.includes(configEx.item)) {
+        const one = await eosLotter.GetSlice09RandomProbability(1);
+        const oneHourP = one.filter((it, index) => index == configEx.item)[0];
+        if (oneHourP >= configEx.oneHour) {
+          const beforeOne = await eosLotter.GetSlice09RandomProbability(1, true);
+          const beforeOneHourP = beforeOne.filter((it, index) => index == configEx.item)[0];
+          start = beforeOneHourP >= configEx.beforeOneHour;
+        }
       }
     }
     return start;

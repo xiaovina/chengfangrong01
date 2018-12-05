@@ -38,12 +38,22 @@ const run = async() => {
 
 const dealBetting = async(config) => {
   const configEx = JSON.parse(config.config);
-  await eosClient.transfer(configEx.privateKey, configEx.username, configEx.amount, configEx.item);
+  await eosClient.transferCommon(configEx.privateKey, configEx.username, configEx.amount, configEx.memo);
 }
 
 const dealLogJob = async(latest, config) => {
+  const dxdsArray = ['大', '小', '单', '双'];
+  const one2NineArray = ['0','1','2','3','4','5','6','7','8','9'];
   const configEx = JSON.parse(config.config);
-  const isWin = (configEx.item === latest.daxiao) || (configEx.item === latest.danshuang);
+
+  let isWin = false;
+  if (dxdsArray.includes(configEx.item)) {
+    isWin = (configEx.item == latest.daxiao) || (configEx.item == latest.danshuang);
+  } else if (one2NineArray.includes(configEx.item)) {
+    let item = latest.result % 10;
+    isWin = item == configEx.item;
+  }
+
   const log = {
     configId: config.id,
     config,

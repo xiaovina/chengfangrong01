@@ -600,9 +600,14 @@ class EosLottery {
   }
 
   // 随机概率 0-9
-  async GetSlice09RandomProbability(slice) {
+  async GetSlice09RandomProbability(slice, isBefore = false) {
     let probabilityList = []
-    const allRecords = await this.GetLatest(slice * 60);
+    let allRecords = [];
+    if (isBefore) {
+      allRecords = await this.GetLatest(slice * 60, slice * 60);
+    } else {
+      allRecords = await this.GetLatest(slice * 60);
+    }
     const allSlice = await this.dealRandom09Analizy(allRecords);
 
     const all = 20;

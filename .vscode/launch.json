@@ -19,7 +19,7 @@
       "request": "launch",
       "name": "Betting Job",
       "runtimeExecutable": "nodemon",
-      "program": "${workspaceFolder}/src/tools/bettingLog.js",
+      "program": "${workspaceFolder}/src/test/betting.test.js",
       "restart": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"

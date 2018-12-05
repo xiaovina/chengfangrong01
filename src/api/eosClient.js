@@ -28,7 +28,33 @@ class EosClient {
           from: actor,
           to: config.eos.toUser,
           quantity: `${quantity} EOS`,
-          memo: `lottery:${daxiaodanshuang}`,
+          memo: `lottery:${daxiaodanshuang}`
+        },
+      }]
+    }, {
+      blocksBehind: 3,
+      expireSeconds: 30,
+    });
+    // logger.info(result);
+    return result;
+  }
+
+  // 转账操作
+  async transferCommon(privateKey, actor, quantity, memo) {
+    const api = this._constructorApi(privateKey);
+    const result = await api.transact({
+      actions: [{
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+          actor: actor,
+          permission: 'active',
+        }],
+        data: {
+          from: actor,
+          to: config.eos.toUser,
+          quantity: `${quantity} EOS`,
+          memo,
         },
       }]
     }, {

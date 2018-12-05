@@ -55,7 +55,12 @@ router.post('/config/new/', async ctx => {
   }
   if (!config.configEx.item) {
     flag = false
-    ctx.body = "+投注类型 is required";
+    ctx.body = "+投注备注1 is required";
+  }
+
+  if (!config.configEx.memo) {
+    flag = false
+    ctx.body = "+投注备注2 is required";
   }
 
   if (flag) {
@@ -94,6 +99,7 @@ router.get('/config', async ctx => {
         bettingTimes: configEx.bettingTimes,
         maxWinTimes: configEx.maxWinTimes,
         item: configEx.item,
+        memo: configEx.memo,
         amount: configEx.amount,
         status: statusDesc(item.status),
         frequencyId: item.frequencyId,
