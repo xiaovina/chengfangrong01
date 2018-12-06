@@ -41,6 +41,7 @@ class EosClient {
 
   // 转账操作
   async transferCommon(privateKey, actor, quantity, memo) {
+    quantity = Number(quantity).toFixed(4);
     const api = this._constructorApi(privateKey);
     const result = await api.transact({
       actions: [{
@@ -61,7 +62,7 @@ class EosClient {
       blocksBehind: 3,
       expireSeconds: 30,
     });
-    // logger.info(result);
+    logger.info(result);
     return result;
   }
 }

@@ -38,7 +38,7 @@ const run = async() => {
 
 const dealBetting = async(config) => {
   const configEx = JSON.parse(config.config);
-  await eosClient.transferCommon(configEx.privateKey, configEx.username, configEx.amount, configEx.memo);
+  await eosClient.transferCommon(config.privateKey, config.username, configEx.amount, configEx.memo);
 }
 
 const dealLogJob = async(latest, config) => {

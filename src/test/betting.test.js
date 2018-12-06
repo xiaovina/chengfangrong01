@@ -1,4 +1,5 @@
 const eosService = require('../api/eosLottery');
+const eosClient = require('../api/eosClient');
 const bettingService = require('../api/bettingService');
 const logger = require('../logger');
 
@@ -8,14 +9,15 @@ const run = async() => {
 
   try {
     const config = {
-      config: "{\"oneHour\":\"2\",\"beforeOneHour\":\"10\",\"bettingTimes\":\"120\",\"maxWinTimes\":\"5\",\"amount\":\"5.0000\",\"item\":\"2\",\"memo\":\"lottery:b\"}",
-      frequencyId: '1544021208609'
+      config: "{\"oneHour\":\"2\",\"beforeOneHour\":\"10\",\"bettingTimes\":\"120\",\"maxWinTimes\":\"5\",\"amount\":\"0.1\",\"item\":\"2\",\"memo\":\"lottery:s\"}",
+      frequencyId: '1544021208609',
+      privateKey:'',
+      username:'',
     }
     // await bettingService.checkStart(config);
     // await bettingService.checkStop(config);
-
-    const latest = await eosService.GetLatest(1);
-    dealLogJob(latest[0], config )
+    const configEx = JSON.parse(config.config);
+    await eosClient.transferCommon(config.privateKey, config.username, configEx.amount, configEx.memo);
   } catch (err) {
     logger.error(err);
   }
