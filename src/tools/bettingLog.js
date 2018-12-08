@@ -7,7 +7,7 @@ const sleep = async(ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 const run = async() => {
-  let interval = 60 * 1000
+  const interval = 59500;
 
   while (true) {
     try {

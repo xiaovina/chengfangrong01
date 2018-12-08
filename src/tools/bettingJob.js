@@ -5,25 +5,17 @@ const sleep = async(ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 const run = async() => {
-  let interval = 30 * 1000
-  const defaultInterval = 30 * 1000
-  const maxInterval = 90 * 1000
-
+  const defaultInterval = 60 * 1000
   while (true) {
     try {
       const configs = await bettingService.getAvalibalConfig();
         if (configs && configs.length > 0) {
-        interval = defaultInterval;
 
         for (let config of configs) {
           await dealJob(config);
         }
       } else {
         logger.info('no pending job');
-        interval = interval * 2
-        if (interval > maxInterval) {
-          interval = maxInterval
-        }
       }
     } catch (e) {
       logger.error(e)
@@ -31,8 +23,8 @@ const run = async() => {
 
     logger.info('finished betting jobs')
 
-    await sleep(interval)
-    logger.debug(`auto betting jobs after ${interval / 1000} seconds`)
+    await sleep(defaultInterval)
+    logger.debug(`auto betting jobs after ${defaultInterval / 1000} seconds`)
 
   }
 }
