@@ -1,3 +1,4 @@
+const moment = require('moment');
 const bettingService = require('../api/bettingService');
 const eosService = require('../api/eosLottery');
 const eosClient = require('../api/eosClient');
@@ -7,10 +8,13 @@ const sleep = async(ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 const run = async() => {
-  const interval = 59500;
+  let interval = 60000;
+  const defaultInterval = 60000;
 
   while (true) {
     try {
+      interval = defaultInterval;
+      const before = new moment();
       const configs = await bettingService.getPendingConfig();
         if (configs && configs.length > 0) {
         const latest = await eosService.GetLatest(1);
@@ -20,11 +24,14 @@ const run = async() => {
             logger.info("isReal", config.isReal);
             await dealBetting(config);
           }
-          dealLogJob(latest[0], config);
+          await dealLogJob(latest[0], config);
         }
       } else {
         logger.info('no pending betting log job')
       }
+      const end = new moment();
+      interval = interval - Number(end - before);
+
     } catch (e) {
       logger.error(e)
     }
