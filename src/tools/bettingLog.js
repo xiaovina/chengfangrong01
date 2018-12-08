@@ -18,7 +18,7 @@ const run = async() => {
           logger.info("config", config);
           if (config.isReal) {
             logger.info("isReal", config.isReal);
-            dealBetting(config);
+            await dealBetting(config);
           }
           dealLogJob(latest[0], config);
         }
