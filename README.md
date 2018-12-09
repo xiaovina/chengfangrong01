@@ -17,7 +17,7 @@ ls -la
 #### init ldata
 
 ``` sh
-NODE_ENV=<env> node tools/initLottery.js <gameid>
+NODE_ENV=<env> node src/tools/initLottery.js <gameid>
 ```
 
 #### start sync work

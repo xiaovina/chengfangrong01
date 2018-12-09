@@ -47,7 +47,6 @@ class RealTime {
 
         let part = _.filter(list, ['x', element]);
         part = part.reverse();
-        logger.debug(part);
 
         item.label = element;
         item.data = part.map(it => {
@@ -67,7 +66,6 @@ class RealTime {
         let item = { label:'', data:[] };
         let part = _.filter(list, ['x', i.toString()]);
         part = part.reverse();
-        logger.debug(part);
 
         item.label = i;
         item.data = part.map(it =>

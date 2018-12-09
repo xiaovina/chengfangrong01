@@ -121,6 +121,34 @@ class BettingService {
     return await db.selectOne(sql, { frequencyId });
   }
 
+  async getOneUnDealLog() {
+    const sql = `
+    select id, recordTime, config from bettinglog
+    where isdeal = 0 limit 1;
+    `;
+    return await db.selectOne(sql);
+  }
+
+  async dealOneLog(id, result, isWin) {
+    const sql = `
+    update bettinglog set result=:result,
+    isWin=:isWin,
+    isDeal=1
+    where id=:id;
+    `;
+    await db.execute(sql, { result, isWin, id });
+  }
+
+  async getLotteryRecord(recordTime) {
+    let begin = moment(recordTime);
+    let end = moment(recordTime);
+    begin = begin.second(0).millisecond(0).toISOString();
+    end = end.second(0).millisecond(0).add(1, 'm').toISOString();
+    const sql = `
+    select * from lotteryRecord where recordTime >=:begin and recordTime <=:end;
+    `;
+    return await db.selectOne(sql, {begin, end});
+  }
   /// ********************** log end **********************
 
 

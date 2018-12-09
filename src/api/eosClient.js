@@ -62,7 +62,6 @@ class EosClient {
       blocksBehind: 3,
       expireSeconds: 30,
     });
-    logger.info(result);
     return result;
   }
 }

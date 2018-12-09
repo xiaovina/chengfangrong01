@@ -35,10 +35,14 @@ CREATE TABLE `BettingLog` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `configId` int(11) NOT NULL,
   `config` json NOT NULL,
-  `result` int(11) NOT NULL,
   `createdAt` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `updatedAt` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `frequencyId` varchar(200) NOT NULL DEFAULT '',
+  `result` int(11) NOT NULL,
   `eos` json DEFAULT NULL,
+  `transaction` json NULL,
+  `recordTime` datetime NULL,
   `isWin` tinyint(1) DEFAULT NULL,
+  `isDeal` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6689 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

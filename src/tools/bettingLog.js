@@ -5,7 +5,7 @@ const eosClient = require('../api/eosClient');
 const logger = require('../logger');
 
 const sleep = async(ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 const run = async() => {
   let interval = 60000;
@@ -17,57 +17,66 @@ const run = async() => {
       const before = new moment();
       const configs = await bettingService.getPendingConfig();
       if (configs && configs.length > 0) {
-      const latest = await eosService.GetLatest(1);
-      for (let config of configs) {
-        logger.info("config", config);
-        if (config.isReal) {
-          logger.info("isReal", config.isReal);
-          await dealBetting(config);
+        for (let config of configs) {
+          logger.info("config", config);
+          if (config.isReal) {
+            logger.info("isReal", config.isReal);
+            const transferResult = await dealBetting(config);
+            // real log
+            await createLog(config, transferResult);
+          } else {
+            // unreal log
+            await createLog(config);
+          }
         }
-        await dealLogJob(latest[0], config);
-      }
       } else {
-        logger.info('no pending betting log job')
+        logger.info('no pending betting log job');
       }
       const end = new moment();
       interval = interval - Number(end - before);
 
     } catch (e) {
-      logger.error(e)
+      logger.error(e);
     }
 
-    logger.info('finished betting log jobs')
+    logger.info('finished betting log jobs');
 
-    await sleep(interval)
-    logger.debug(`auto betting log jobs after ${interval / 1000} seconds`)
+    await sleep(interval);
+    logger.debug(`auto betting log jobs after ${interval / 1000} seconds`);
   }
 }
 
 const dealBetting = async(config) => {
   const configEx = JSON.parse(config.config);
-  await eosClient.transferCommon(config.privateKey, config.username, configEx.toUserName, configEx.amount, configEx.memo);
+  return await eosClient.transferCommon(config.privateKey, config.username, configEx.toUserName, configEx.amount, configEx.memo);
 }
 
-const dealLogJob = async(latest, config) => {
-  const dxdsArray = ['大', '小', '单', '双'];
-  const one2NineArray = ['0','1','2','3','4','5','6','7','8','9'];
-  const configEx = JSON.parse(config.config);
-
-  let isWin = false;
-  if (dxdsArray.includes(configEx.item)) {
-    isWin = (configEx.item == latest.daxiao) || (configEx.item == latest.danshuang);
-  } else if (one2NineArray.includes(configEx.item)) {
-    let item = latest.result % 10;
-    isWin = item == configEx.item;
-  }
-
-  const log = {
-    configId: config.id,
-    config,
-    result: latest.result,
-    isWin :isWin ? 1 : 0,
-    frequencyId: config.frequencyId,
-    eos: latest,
+const createLog = async(config, transaction=null) => {
+  let log;
+  if (transaction) {
+    log = {
+      configId: config.id,
+      config: config,
+      frequencyId: config.frequencyId,
+      result: 0,
+      eos: {},
+      transaction: transaction,
+      recordTime: moment(transaction.processed.block_time),
+      isWin: 0,
+      isDeal: 0,
+    }
+  } else {
+    log = {
+      configId: config.id,
+      config: config,
+      frequencyId: config.frequencyId,
+      result: 0,
+      eos: {},
+      transaction: {},
+      recordTime: new moment(),
+      isWin: 0,
+      isDeal: 0,
+    }
   }
   await bettingService.createLog(log);
 }
