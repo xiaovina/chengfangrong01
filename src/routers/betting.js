@@ -30,6 +30,11 @@ router.post('/config/new/', async ctx => {
     ctx.body = "投注规则 is required";
   }
 
+  if (!config.configEx.toUserName) {
+    flag = false
+    ctx.body = "目标账号 is required";
+  }
+
   if (!config.configEx.oneHour || config.configEx.oneHour <= 0) {
     flag = false
     ctx.body = "一小时概率 is required";
@@ -107,6 +112,7 @@ router.get('/config', async ctx => {
         beforeOneHour: configEx.beforeOneHour,
         bettingTimes: configEx.bettingTimes,
         maxWinTimes: configEx.maxWinTimes,
+        toUserName: configEx.toUserName,
         item: configEx.item,
         memo: configEx.memo,
         amount: configEx.amount,

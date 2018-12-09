@@ -6,6 +6,7 @@ class ConfigModelEx {
   amount;
   item;
   memo;
+  toUserName;
   constructor(oneHour, beforeOneHour, bettingTimes, maxWinTimes, amount, item) {
     this.oneHour = oneHour;
     this.beforeOneHour = beforeOneHour;
@@ -14,6 +15,7 @@ class ConfigModelEx {
     this.amount = amount;
     this.item = item;
     this.memo = memo;
+    this.toUserName;
   }
 }
 const configModelEx = new ConfigModelEx()

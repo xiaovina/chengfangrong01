@@ -40,7 +40,7 @@ class EosClient {
   }
 
   // 转账操作
-  async transferCommon(privateKey, actor, quantity, memo) {
+  async transferCommon(privateKey, actor, toUserName, quantity, memo) {
     quantity = Number(quantity).toFixed(4);
     const api = this._constructorApi(privateKey);
     const result = await api.transact({
@@ -53,7 +53,7 @@ class EosClient {
         }],
         data: {
           from: actor,
-          to: config.eos.toUser,
+          to: toUserName || config.eos.toUser,
           quantity: `${quantity} EOS`,
           memo,
         },

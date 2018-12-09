@@ -16,16 +16,16 @@ const run = async() => {
       interval = defaultInterval;
       const before = new moment();
       const configs = await bettingService.getPendingConfig();
-        if (configs && configs.length > 0) {
-        const latest = await eosService.GetLatest(1);
-        for (let config of configs) {
-          logger.info("config", config);
-          if (config.isReal) {
-            logger.info("isReal", config.isReal);
-            await dealBetting(config);
-          }
-          await dealLogJob(latest[0], config);
+      if (configs && configs.length > 0) {
+      const latest = await eosService.GetLatest(1);
+      for (let config of configs) {
+        logger.info("config", config);
+        if (config.isReal) {
+          logger.info("isReal", config.isReal);
+          await dealBetting(config);
         }
+        await dealLogJob(latest[0], config);
+      }
       } else {
         logger.info('no pending betting log job')
       }
@@ -45,7 +45,7 @@ const run = async() => {
 
 const dealBetting = async(config) => {
   const configEx = JSON.parse(config.config);
-  await eosClient.transferCommon(config.privateKey, config.username, configEx.amount, configEx.memo);
+  await eosClient.transferCommon(config.privateKey, config.username, configEx.toUserName, configEx.amount, configEx.memo);
 }
 
 const dealLogJob = async(latest, config) => {
