@@ -68,23 +68,27 @@ const dealBettingJob = async(config) => {
 
 const dealLog = async() => {
   const job = await bettingService.getOneUnDealLog();
-  const config = job.config;
+  if (job && job.config) {
+    const config = job.config;
 
-  const record = await bettingService.getLotteryRecord(job.recordTime);
+    const record = await bettingService.getLotteryRecord(job.recordTime);
 
-  const dxdsArray = ['大', '小', '单', '双'];
-  const one2NineArray = ['0','1','2','3','4','5','6','7','8','9'];
-  const configEx = JSON.parse(config.config);
+    const dxdsArray = ['大', '小', '单', '双'];
+    const one2NineArray = ['0','1','2','3','4','5','6','7','8','9'];
+    const configEx = JSON.parse(config.config);
 
-  let isWin = false;
-  if (dxdsArray.includes(configEx.item)) {
-    isWin = (configEx.item == record.daxiao) || (configEx.item == record.danshuang);
-  } else if (one2NineArray.includes(configEx.item)) {
-    let item = record.result % 10;
-    isWin = item == configEx.item;
+    if (record && record.danshuang) {
+      let isWin = false;
+      if (dxdsArray.includes(configEx.item)) {
+        isWin = (configEx.item == record.daxiao) || (configEx.item == record.danshuang);
+      } else if (one2NineArray.includes(configEx.item)) {
+        let item = record.result % 10;
+        isWin = item == configEx.item;
+      }
+      isWin = isWin ? 1: 0;
+      await bettingService.dealOneLog(job.id, record.result, isWin);
+    }
   }
-  isWin = isWin ? 1: 0;
-  await bettingService.dealOneLog(job.id, record.result, isWin);
 }
 
 run()
