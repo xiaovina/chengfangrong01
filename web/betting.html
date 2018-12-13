@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css" />
   <script src="js/jquery.min.js"></script>
+  <script src="js/bootstarp.min.js"></script>
 </head>
 <body >
   <div class="container">
@@ -14,16 +15,16 @@
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">一小时概率</th>
-            <th scope="col">前一小时概率</th>
-            <th scope="col">投注次数</th>
-            <th scope="col">总盈利次数</th>
-            <th scope="col">投注金额</th>
+            <th scope="col">一小时</th>
+            <th scope="col">前一小时</th>
+            <th scope="col">投注数</th>
+            <th scope="col">盈利数</th>
+            <th scope="col">金额</th>
             <th scope="col">目标账号</th>
-            <th scope="col">投注备注1</th>
-            <th scope="col">投注备注2</th>
-            <th scope="col">投注类型</th>
-            <th scope="col">投注状态</th>
+            <th scope="col">备注1</th>
+            <th scope="col">备注2</th>
+            <th scope="col">类型</th>
+            <th scope="col">状态</th>
             <th scope="col">操作</th>
           </tr>
         </thead>
@@ -160,109 +161,37 @@
     </fieldset>
   </div>
 
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">当前投注情况</h4>
+            </div>
+            <div class="modal-body">
+              <div>总投注：<span id="modalTotal"></span>，中奖：<span id="winCount" style="color: red;"></span>，未中：<span id="lostCount"></span>，处理中：<span id="dealingCount"></span></span></div>
+              <table class="table">
+                  <thead>
+                      <tr>
+                        <th>结果</th>
+                        <th>时间</th>
+                        <th>盈亏</th>
+                      </tr>
+                  </thead>
+                  <tbody id="modalContent">
+                      <tr>
+                        <td>029821</td>
+                        <td>2018-12-12 09:23</td>
+                        <td>盈</td>
+                      </tr>
+                  </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+  </div>
 </body>
-<script>
-
-
-$(function(){
-  console.log('init');
-  getConfig();
-})
-
-function _sleep(milliseconds) {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
-function getConfig() {
-  $.ajax({
-    url: `/api/v1/betting/config`,
-    method: 'get',
-  }).done(function(res) {
-    console.log(res);
-    if (res && res.length > 0) {
-      let tbody = "";
-      for (const item of res) {
-        tbody += "<tr>";
-          tbody += "<th scope=\"row\">" + item.id + "</th>";
-          tbody += "<td>" + item.oneHour + "%</th>";
-          tbody += "<td>" + item.beforeOneHour + "%</td>";
-          tbody += "<td>" + item.bettingTimes + "</td>";
-          tbody += "<td>" + item.maxWinTimes + "</td>";
-          tbody += "<td>" + item.amount + "</td>";
-          tbody += "<td>" + item.toUserName + "</td>";
-          tbody += "<td>" + item.memo + "</td>";
-          tbody += "<td>" + item.item + "</td>";
-          tbody += "<td>" + item.isReal + "</td>";
-          tbody += "<td>" + item.status + "</td>";
-          tbody += "<td><a href=\"#\" onclick=\"changeStatus(" + item.id + ", 0)\" >开始</a> | <a href=\"#\" onclick=\"changeStatus(" + item.id + ", 2)\" >停止</a> <a href=\"#\" onclick=\"deleteConfig(" + item.id + ")\" >删除</a></td>";
-        tbody += "</tr>";
-      }
-      $("#configList").html(tbody);
-    }
-  });
-}
-
-function changeStatus(id, status) {
-  $.ajax({
-    url: `/api/v1/betting/config/status/`,
-    data: {
-      id, status
-    },
-    method: 'post',
-  }).done(function(res) {
-    getConfig();
-  });
-}
-
-function deleteConfig(id) {
-  $.ajax({
-    url: `/api/v1/betting/config/delete/`,
-    data: {
-      id
-    },
-    method: 'post',
-  }).done(function(res) {
-    getConfig();
-  });
-}
-
-function createConfig() {
-  const oneHour = $("#oneHour").val();
-  const beforeOneHour = $("#beforeOneHour").val();
-  const bettingTimes = $("#bettingTimes").val();
-  const maxWinTimes = $("#maxWinTimes").val();
-  const amount = $("#amount").val();
-  const item = $("#item").val();
-  const memo = $("#memo").val();
-  const isReal = $("input[name=isReal]:checked").val();
-  const toUserName = $("#toUserName").val();
-  const username = $("#username").val();
-  const privateKey = $("#privateKey").val();
-
-
-  const data = {
-    isReal,
-    username,
-    privateKey,
-    configEx: {
-      oneHour,
-      beforeOneHour,
-      bettingTimes,
-      maxWinTimes,
-      amount,
-      item,
-      memo,
-      toUserName,
-    }
-  }
-  $.ajax({
-    url: `/api/v1/betting/config/new/`,
-    data,
-    method: 'post',
-  }).done(function(res) {
-    $("#createResult").html(res);
-    getConfig();
-  });
-}
-</script>
+<script src="js/ui/betting.js"></script>
 </html>

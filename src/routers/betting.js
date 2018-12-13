@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const bettingService = require('../api/bettingService');
+const moment = require('moment');
 
 const router = new Router({
   prefix: '/betting'
@@ -126,6 +127,33 @@ router.get('/config', async ctx => {
     }
   }
   ctx.body = resultList;
+});
+
+router.get('/config/frequency/', async ctx => {
+  let { frequencyId } = ctx.request.query;
+  let result = {};
+  const list = await bettingService.getLogRecordByFrequencyId(frequencyId);
+  if (list && list.length) {
+    result.list = list;
+    result.total = list.length;
+    result.winCount = list.filter(it => it.isWin === 1 && it.isDeal === 1).length;
+    result.dealingCount = list.filter(it => it.isDeal === 0).length;
+    result.lostCount = list.length - result.winCount - result.dealingCount;
+
+    for(let item of list) {
+      if (item.isDeal) {
+        item.isWin = item.isWin === 1 ? "Win": "Lost";
+        item.result = `000000${item.result}`.substr(-6, 6);
+      } else {
+        item.isWin = "处理中";
+        item.result = '-';
+      }
+
+      item.recordTimeEx = item.recordTime;
+      item.recordTime = moment(item.recordTime).format('YYYY/MM/DD HH:mm');
+    }
+  }
+  ctx.body = result;
 });
 
 const statusDesc = (status) => {
