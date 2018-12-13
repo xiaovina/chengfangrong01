@@ -99,6 +99,14 @@ class BettingService {
     return await db.selectAll(sql, { frequencyId });
   }
 
+  async getFrequencyList(configId) {
+    const sql = `
+    select frequencyId, recordTime from BettingLog where configId =:configId
+    group by frequencyId
+    order by recordTime desc;
+    `;
+    return await db.selectAll(sql, { configId });
+  }
   async getWinCountByFrequencyId(frequencyId) {
     const win = await this._getWinCount(frequencyId);
     const lose = await this._getLostCount(frequencyId);

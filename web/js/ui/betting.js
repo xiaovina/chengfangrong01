@@ -133,9 +133,9 @@ function dealFrequencyModal(data) {
 }
 
 function _resetFrequencyModal() {
-  $("#winCount").html('');
-  $("#lostCount").html('');
-  $("#dealingCount").html('');
-  $("#modalTotal").html('');
+  $("#winCount").html(0);
+  $("#lostCount").html(0);
+  $("#dealingCount").html(0);
+  $("#modalTotal").html(0);
   $("#modalContent").html('');
 }

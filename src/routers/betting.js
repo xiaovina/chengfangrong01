@@ -156,6 +156,12 @@ router.get('/config/frequency/', async ctx => {
   ctx.body = result;
 });
 
+
+router.get('/config/frequencies/', async ctx => {
+  let { configId } = ctx.request.query;
+  ctx.body = await bettingService.getFrequencyList(configId);
+});
+
 const statusDesc = (status) => {
   switch (status) {
     case 0:
