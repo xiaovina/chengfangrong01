@@ -119,7 +119,7 @@ router.get('/config', async ctx => {
         status: statusDesc(item.status),
         frequencyId: item.frequencyId,
         username: item.username,
-        privateKey: item.privateKey,
+        // privateKey: item.privateKey,
         isReal: item.isReal ? '真实' : '虚拟'
       }
       resultList.push(resultItem);
