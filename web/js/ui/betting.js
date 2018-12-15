@@ -62,6 +62,7 @@ function deleteConfig(id) {
 }
 
 function queryConfig(frequencyId) {
+  _resetFrequencyModal()
   $.ajax({
     url: `/api/v1/betting/config/frequency?frequencyId=${frequencyId}`,
     method: 'get'
