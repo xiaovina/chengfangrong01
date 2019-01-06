@@ -84,7 +84,6 @@ const dealLog = async() => {
       } else if (one2NineArray.includes(configEx.item)) {
         let item = record.result % 10;
         isWin = item == configEx.item;
-
       }
       isWin = isWin ? 1: 0;
       await bettingService.dealOneLog(job.id, record.result, isWin);
